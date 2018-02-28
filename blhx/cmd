@@ -1,0 +1,12 @@
+adb shell "x=/data/app/$(ls /data/app|grep xxx.screenshotapp);if [[ -d $x ]] then export CLASSPATH=$x/base.apk; else export CLASSPATH=$x; fi;exec app_process /system/bin xxx.xxx.screenshotapp.Main '$@'"
+
+adb shell "x=/sdcard/Android/data/xxx.xxx.screenshotapp; if [[ ! -e $x ]] then mkdir $x;fi"
+adb push classes.dex /sdcard/Android/data/xxx.xxx.screenshotapp/
+adb shell "x=/sdcard/Android/data/xxx.xxx.screenshotapp; export CLASSPATH=$x/classes.dex; exec app_process $x xxx.xxx.screenshotapp.Main '$@'"
+
+adb forward tcp:53516 tcp:53516
+
+
+type=home
+http://127.0.0.1:53516/sendevent?clientX=100&clientY=100&type=mousedown
+http://127.0.0.1:53516/sendevent?clientX=100&clientY=100&type=mouseup&downDelta=50

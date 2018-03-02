@@ -41,15 +41,25 @@ public class InputHelper extends BaseHelper {
     }};
 
 
-    //    static public MotionEvent obtain(long downTime, long eventTime, int action,
-//                                     float x, float y, float pressure, float size, int metaState,
-//                                     float xPrecision, float yPrecision, int deviceId, int edgeFlags) {
     private static void injectMotionEvent(InputManager inputManager, Method injectInputEventMethod,
                                           int source, int action, long downTime, long eventTime,
                                           float x, float y, float yPrecision) {
-        MotionEvent motionEvent = MotionEvent.obtain(downTime, eventTime, action, x, y,
-                yPrecision, 1.0F, 0, 1.0F, 1.0F, 0, 0);
+        MotionEvent.PointerProperties[] pointerProperties = new MotionEvent.PointerProperties[1];
+        pointerProperties[0] = new MotionEvent.PointerProperties();
+        pointerProperties[0].clear();
+        pointerProperties[0].toolType = MotionEvent.TOOL_TYPE_FINGER;
+        pointerProperties[0].id = 0;
+        MotionEvent.PointerCoords[] pointerCoords = new MotionEvent.PointerCoords[1];
+        pointerCoords[0] = new MotionEvent.PointerCoords();
+        pointerCoords[0].clear();
+        pointerCoords[0].x = x;
+        pointerCoords[0].y = y;
+        pointerCoords[0].pressure = 1.0F;
+        pointerCoords[0].size = 1.0F;
+        MotionEvent motionEvent = MotionEvent.obtain(downTime, eventTime, action, 1, pointerProperties, pointerCoords,
+                0, 0, 1.0F, yPrecision, 6, 0, InputDevice.SOURCE_TOUCHSCREEN, 0);
         motionEvent.setSource(source);
+
         try {
             injectInputEventMethod.invoke(inputManager, motionEvent, 0);
         } catch (Exception e) {
@@ -58,24 +68,38 @@ public class InputHelper extends BaseHelper {
         motionEvent.recycle();
     }
 
-    private static void sendKeyEvent(InputManager inputManager, Method injectInputEventMethod, int source, int code, boolean shift) {
-        long l = SystemClock.uptimeMillis();
-        if (shift) {
-        }
-        for (int i = 1; ; i = 0) {
-            try {
-                injectKeyEvent(inputManager, injectInputEventMethod, new KeyEvent(l, l, 0, code, 0, i, -1, 0, 0, source));
-                injectKeyEvent(inputManager, injectInputEventMethod, new KeyEvent(l, l, 1, code, 0, i, -1, 0, 0, source));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-    }
-
     private static void injectKeyEvent(InputManager paramInputManager, Method injectInputEventMethod, KeyEvent keyEvent)
             throws InvocationTargetException, IllegalAccessException {
         injectInputEventMethod.invoke(paramInputManager, keyEvent, 0);
+    }
+
+    /**
+     * @param deltaTime 25ms - 150ms
+     */
+    private static void sendClickEvent(InputManager inputManager, Method injectInputEventMethod,
+                                       float x, float y, long deltaTime) {
+        long time = SystemClock.uptimeMillis();
+        try {
+            injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
+                    MotionEvent.ACTION_DOWN, time, time, x, y, 1.0F);
+            injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
+                    MotionEvent.ACTION_UP, time, time + deltaTime, x, y, 1.0F);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void sendKeyEvent(InputManager inputManager, Method injectInputEventMethod, int source, int code, boolean shift) {
+        long time = SystemClock.uptimeMillis();
+        int metaShiftOn = shift ? KeyEvent.META_SHIFT_ON : 0;
+        try {
+            injectKeyEvent(inputManager, injectInputEventMethod,
+                    new KeyEvent(time, time, MotionEvent.ACTION_DOWN, code, 0, metaShiftOn, -1, 0, 0, source));
+            injectKeyEvent(inputManager, injectInputEventMethod,
+                    new KeyEvent(time, time, MotionEvent.ACTION_UP, code, 0, metaShiftOn, -1, 0, 0, source));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -157,6 +181,7 @@ public class InputHelper extends BaseHelper {
                     pointerProperties[0].clear();
                     pointerProperties[0].id = 0;
                     MotionEvent.PointerCoords[] pointerCoords = new MotionEvent.PointerCoords[1];
+                    pointerCoords[0] = new MotionEvent.PointerCoords();
                     pointerCoords[0].clear();
                     pointerCoords[0].x = clientX;
                     pointerCoords[0].y = clientY;
@@ -164,8 +189,8 @@ public class InputHelper extends BaseHelper {
                     pointerCoords[0].size = 1.0F;
                     pointerCoords[0].setAxisValue(10, (float) paramJson.optDouble("deltaX"));
                     pointerCoords[0].setAxisValue(9, (float) paramJson.optDouble("deltaY"));
-                    MotionEvent motionEvent = MotionEvent.obtain(l, l, 8, 1, pointerProperties, pointerCoords,
-                            0, 0, 1.0F, 1.0F, 0, 0, 4098, 0);
+                    MotionEvent motionEvent = MotionEvent.obtain(l, l, MotionEvent.ACTION_SCROLL, 1, pointerProperties, pointerCoords,
+                            0, 0, 1.0F, 1.0F, 0, 0, InputDevice.SOURCE_TOUCHSCREEN, 0);
                     try {
                         injectInputEventMethod.invoke(inputManager, motionEvent, 0);
                     } catch (Exception e) {
@@ -206,7 +231,7 @@ public class InputHelper extends BaseHelper {
                         if (this.isDown) {
                             long eventTime = this.downTime + paramJson.optLong("downDelta", SystemClock.uptimeMillis() - this.downTime);
                             injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
-                                    2, this.downTime, eventTime, x, y, 1.0F);
+                                    MotionEvent.ACTION_MOVE, this.downTime, eventTime, x, y, 1.0F);
                         }
                         break;
                     case "mouseup":
@@ -214,7 +239,7 @@ public class InputHelper extends BaseHelper {
                             this.isDown = false;
                             long eventTime = this.downTime + paramJson.optLong("downDelta", SystemClock.uptimeMillis() - this.downTime);
                             injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
-                                    1, this.downTime, eventTime, x, y, 1.0F);
+                                    MotionEvent.ACTION_UP, this.downTime, eventTime, x, y, 1.0F);
                         }
                         break;
                     case "mousedown":
@@ -222,9 +247,14 @@ public class InputHelper extends BaseHelper {
                             this.downTime = SystemClock.uptimeMillis();
                             this.isDown = true;
                             injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
-                                    0, this.downTime, this.downTime, x, y, 1.0F);
+                                    MotionEvent.ACTION_DOWN, this.downTime, this.downTime, x, y, 1.0F);
                         }
                         break;
+                    case "click":
+                        if (!this.isDown) {
+                            long downDelta = paramJson.optLong("downDelta", SystemClock.uptimeMillis() - this.downTime);
+                            sendClickEvent(inputManager, injectInputEventMethod, x, y, downDelta);
+                        }
                     default:
                         return false;
                 }

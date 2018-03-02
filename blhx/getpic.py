@@ -31,9 +31,10 @@ def screenshotStart():
     os.system(
         'adb push classes.dex /sdcard/Android/data/xxx.xxx.screenshotapp/')
     os.system(
-        '''adb shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; 
+        '''
+        adb shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; 
             export CLASSPATH=$x/classes.dex; 
-            exec app_process $x xxx.xxx.screenshotapp.Main \'$@\''>/dev/null &"
+            exec app_process $x xxx.xxx.screenshotapp.Main' >/dev/null &
         '''
     )
     time.sleep(3)   #wait for the service start
@@ -46,9 +47,9 @@ def rootScreenshotStart():
     os.system('adb forward tcp:53516 tcp:53516')
     os.system(
         '''
-        adb shell 'x=/data/app/$(ls /data/app|grep xxx.screenshotapp);
-            if [[ -d $x ]]
-                then export CLASSPATH=$x/base.apk; 
+        adb shell 'x=/data/app/$(su -c ls /data/app|grep xxx.screenshotapp);
+            if [[ -d $x ]] then
+                export CLASSPATH=$x/base.apk;
             else 
                 export CLASSPATH=$x; 
             fi;

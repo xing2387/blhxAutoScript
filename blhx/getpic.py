@@ -47,7 +47,7 @@ def rootScreenshotStart():
     os.system('adb forward tcp:53516 tcp:53516')
     os.system(
         '''
-        adb shell 'x=/data/app/$(su -c ls /data/app|grep xxx.screenshotapp);
+        adb shell 'x=/data/app/$(su -c "ls /data/app|grep xxx.screenshotapp");
             if [[ -d $x ]] then
                 export CLASSPATH=$x/base.apk;
             else 

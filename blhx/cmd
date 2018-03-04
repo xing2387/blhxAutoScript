@@ -14,3 +14,73 @@ http://127.0.0.1:53516/sendevent?clientX=100&clientY=100&type=mouseup&downDelta=
 
 
 [[207.0, 1038.0], [[217.0, 228.0, 241.42577], [1022.0, 1012.0, 1002.7698]], [[244.0, 264.0, 293.0, 298.7515], [1001.0, 985.0, 967.0, 963.9551]], [[327.0, 364.0, 386.93173], [949.0, 935.0, 925.5575]], [[398.0, 435.0, 475.0, 480.16498], [921.0, 908.0, 895.0, 893.3214]], [[514.0], [887.0]], [514.0, 887.0]]
+
+[[207.0, 1038.0], 
+[[217.0, 228.0, 241.42577], [1022.0, 1012.0, 1002.7698]], 
+[[244.0, 264.0, 293.0, 298.7515], [1001.0, 985.0, 967.0, 963.9551]], 
+[[327.0, 364.0, 386.93173], [949.0, 935.0, 925.5575]], 
+[[398.0, 435.0, 475.0, 480.16498], [921.0, 908.0, 895.0, 893.3214]], 
+[[514.0], [887.0]], 
+[514.0, 887.0]]
+
+MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=674.0, y[0]=1569.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=17139020, downTime=17139020, deviceId=3, source=0x1002 }
+
+
+MotionEvent { action=ACTION_DOWN, id[0]=0, x[0]=674.0, y[0]=1569.0, historySize=0, eventTime=17139020, downTime=17139020, deviceId=3, source=0x1002 }
+[674.0]
+[1569.0]
+=============
+MotionEvent { action=ACTION_MOVE, id[0]=0, x[0]=679.1136, y[0]=1536.6593, historySize=2, eventTime=17139111, downTime=17139020, deviceId=3, source=0x1002 }
+[674.0, 678.0, 679.1136]
+[1552.0, 1540.0, 1536.6593]
+=============
+MotionEvent { action=ACTION_MOVE, id[0]=0, x[0]=701.4246, y[0]=1480.2239, historySize=2, eventTime=17139128, downTime=17139020, deviceId=3, source=0x1002 }
+[683.0, 692.0, 701.4246]
+[1525.0, 1503.0, 1480.2239]
+=============
+MotionEvent { action=ACTION_MOVE, id[0]=0, x[0]=736.9098, y[0]=1393.9633, historySize=3, eventTime=17139145, downTime=17139020, deviceId=3, source=0x1002 }
+[704.0, 718.0, 733.0, 736.9098]
+[1474.0, 1438.0, 1402.0, 1393.9633]
+=============
+MotionEvent { action=ACTION_MOVE, id[0]=0, x[0]=780.2184, y[0]=1309.6477, historySize=2, eventTime=17139162, downTime=17139020, deviceId=3, source=0x1002 }
+[751.0, 771.0, 780.2184]
+[1365.0, 1327.0, 1309.6477]
+=============
+MotionEvent { action=ACTION_MOVE, id[0]=0, x[0]=788.0, y[0]=1295.0, historySize=0, eventTime=17139165, downTime=17139020, deviceId=3, source=0x1002 }
+[788.0]
+[1295.0]
+=============
+MotionEvent { action=ACTION_UP, id[0]=0, x[0]=788.0, y[0]=1295.0, historySize=0, eventTime=17139178, downTime=17139020, deviceId=3, source=0x1002 }
+[788.0]
+[1295.0]
+=============
+
+
+
+
+MotionEvent { action=ACTION_DOWN, id[0]=0, x[0]=207.0, y[0]=1038.0, historySize=0, eventTime=17464134, downTime=17464134, deviceId=6, source=0x1002 }
+[207.0]
+[1038.0]
+=============
+MotionEvent { action=ACTION_MOVE, id[0]=0, x[0]=514.0, y[0]=887.0, historySize=4, eventTime=17464136, downTime=17464134, deviceId=6, source=0x1002 }
+[217.0, 244.0, 327.0, 398.0, 514.0]
+[1022.0, 1001.0, 949.0, 921.0, 887.0]
+=============
+MotionEvent { action=ACTION_UP, id[0]=0, x[0]=514.0, y[0]=887.0, historySize=0, eventTime=17464204, downTime=17464134, deviceId=6, source=0x1002 }
+[514.0]
+[887.0]
+=============
+
+
+03-04 13:40:33.681 22567-22567/xxx.xxx.screenshotapp D/MainActivity: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=207.0, y[0]=1038.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=17890074, downTime=17890074, deviceId=6, source=0x1002 }
+03-04 13:40:33.681 22567-22567/xxx.xxx.screenshotapp D/MainActivity: [207.0]
+03-04 13:40:33.681 22567-22567/xxx.xxx.screenshotapp D/MainActivity: [1038.0]
+03-04 13:40:33.681 22567-22567/xxx.xxx.screenshotapp D/MainActivity: =============
+03-04 13:40:33.696 22567-22567/xxx.xxx.screenshotapp D/MainActivity: MotionEvent { action=ACTION_MOVE, actionButton=0, id[0]=0, x[0]=514.0, y[0]=887.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=4, eventTime=17890151, downTime=17890074, deviceId=6, source=0x1002 }
+03-04 13:40:33.696 22567-22567/xxx.xxx.screenshotapp D/MainActivity: [217.0, 244.0, 327.0, 398.0, 514.0]
+03-04 13:40:33.696 22567-22567/xxx.xxx.screenshotapp D/MainActivity: [1022.0, 1001.0, 949.0, 921.0, 887.0]
+03-04 13:40:33.696 22567-22567/xxx.xxx.screenshotapp D/MainActivity: =============
+03-04 13:40:33.696 22567-22567/xxx.xxx.screenshotapp D/MainActivity: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=514.0, y[0]=887.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=17890144, downTime=17890074, deviceId=6, source=0x1002 }
+03-04 13:40:33.696 22567-22567/xxx.xxx.screenshotapp D/MainActivity: [514.0]
+03-04 13:40:33.696 22567-22567/xxx.xxx.screenshotapp D/MainActivity: [887.0]
+03-04 13:40:33.696 22567-22567/xxx.xxx.screenshotapp D/MainActivity: =============

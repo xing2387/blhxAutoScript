@@ -30,6 +30,7 @@ import java.util.List;
 
 public class InputHelper extends BaseHelper {
 
+    private static final String TAG = "screenshotapp";
 
     private static WebSocket.StringCallback sInputEventCallback;
 
@@ -61,38 +62,6 @@ public class InputHelper extends BaseHelper {
         pointerCoords[0].y = y;
         pointerCoords[0].pressure = 1.0F;
         pointerCoords[0].size = 1.0F;
-        MotionEvent motionEvent = MotionEvent.obtain(downTime, eventTime, action, 1, pointerProperties, pointerCoords,
-                0, 0, 1.0F, yPrecision, 6, 0, InputDevice.SOURCE_TOUCHSCREEN, 0);
-        motionEvent.setSource(source);
-
-        try {
-            injectInputEventMethod.invoke(inputManager, motionEvent, 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        motionEvent.recycle();
-    }
-
-    private static void injectMotionEvent(InputManager inputManager, Method injectInputEventMethod,
-                                          int source, int action, long downTime, long eventTime,
-                                          ArrayList<Float> xList, ArrayList<Float> yList, float yPrecision) {
-        if (xList.size() != yList.size()) {
-            throw new RuntimeException("xList must have the same size with yList");
-        }
-        MotionEvent.PointerProperties[] pointerProperties = new MotionEvent.PointerProperties[1];
-        pointerProperties[0] = new MotionEvent.PointerProperties();
-        pointerProperties[0].clear();
-        pointerProperties[0].toolType = MotionEvent.TOOL_TYPE_FINGER;
-        pointerProperties[0].id = 0;
-        MotionEvent.PointerCoords[] pointerCoords = new MotionEvent.PointerCoords[xList.size()];
-        for (int i = 0; i < xList.size(); i++) {
-            pointerCoords[i] = new MotionEvent.PointerCoords();
-            pointerCoords[i].clear();
-            pointerCoords[i].x = xList.get(i);
-            pointerCoords[i].y = yList.get(i);
-            pointerCoords[i].pressure = 1.0F;
-            pointerCoords[i].size = 1.0F;
-        }
         MotionEvent motionEvent = MotionEvent.obtain(downTime, eventTime, action, 1, pointerProperties, pointerCoords,
                 0, 0, 1.0F, yPrecision, 6, 0, InputDevice.SOURCE_TOUCHSCREEN, 0);
         motionEvent.setSource(source);
@@ -190,7 +159,7 @@ public class InputHelper extends BaseHelper {
                         return;
                     }
                 } catch (Exception e) {
-                    Log.e("VysorMain", "input websocket", e);
+                    Log.e("screenshotapp", "input websocket", e);
                     return;
                 }
 
@@ -235,7 +204,7 @@ public class InputHelper extends BaseHelper {
                     }
                     return;
                 }
-                Log.e("VysorMain", "Unknown: " + paramJson);
+                Log.e("screenshotapp", "Unknown: " + paramJson);
             }
 
             public boolean doShowToast(String eventType, JSONObject paramJson) {
@@ -266,7 +235,7 @@ public class InputHelper extends BaseHelper {
                 switch (eventType) {
                     case "mousemove":
                         if (this.isDown) {
-                            long eventTime = this.downTime + paramJson.optLong("downDelta", SystemClock.uptimeMillis() - this.downTime);
+                            long eventTime = this.downTime + paramJson.optLong("deltaTime", SystemClock.uptimeMillis() - this.downTime);
                             injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
                                     MotionEvent.ACTION_MOVE, this.downTime, eventTime, x, y, 1.0F);
                         }
@@ -274,7 +243,7 @@ public class InputHelper extends BaseHelper {
                     case "mouseup":
                         if (this.isDown) {
                             this.isDown = false;
-                            long eventTime = this.downTime + paramJson.optLong("downDelta", SystemClock.uptimeMillis() - this.downTime);
+                            long eventTime = this.downTime + paramJson.optLong("deltaTime", SystemClock.uptimeMillis() - this.downTime);
                             injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
                                     MotionEvent.ACTION_UP, this.downTime, eventTime, x, y, 1.0F);
                         }
@@ -289,48 +258,47 @@ public class InputHelper extends BaseHelper {
                         break;
                     case "click":
                         if (!this.isDown) {
-                            long downDelta = paramJson.optLong("downDelta", SystemClock.uptimeMillis() - this.downTime);
-                            sendClickEvent(inputManager, injectInputEventMethod, x, y, downDelta);
+                            long deltaTime = paramJson.optLong("deltaTime", SystemClock.uptimeMillis() - this.downTime);
+                            sendClickEvent(inputManager, injectInputEventMethod, x, y, deltaTime);
                         }
                     case "drag":
                         if (!this.isDown) {
+                            this.downTime = SystemClock.uptimeMillis();
                             try {
-                                System.out.println("path: " + paramJson.optString("path"));
+                                Log.d(TAG, "path: " + paramJson.optString("path"));
                                 JSONArray jsonArray = new JSONArray(paramJson.optString("path"));
-                                int len = jsonArray.length();
-                                if (len < 3)
-                                    break;
-                                int deltaT = 65;
-                                float downX = Float.valueOf(jsonArray.getJSONArray(0).getString(0));
-                                float downY = Float.valueOf(jsonArray.getJSONArray(0).getString(1));
-                                injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
-                                        MotionEvent.ACTION_DOWN, this.downTime, this.downTime, downX, downY, 1.0F);
-                                for (int i = 1; i < len - 1; i++) {
-                                    int aa = (int) (deltaT * Math.random());
-                                    deltaT -= aa;
-                                    JSONArray xArray = jsonArray.getJSONArray(i).getJSONArray(0);
-                                    ArrayList<Float> xList = new ArrayList<>(xArray.length());
-                                    for (int j = 0; j < xArray.length(); j++) {
-                                        xList.add(Float.valueOf(xArray.getString(j)));
-                                    }
-                                    JSONArray yArray = jsonArray.getJSONArray(i).getJSONArray(1);
-                                    ArrayList<Float> yList = new ArrayList<>(yArray.length());
-                                    for (int j = 0; j < yArray.length(); j++) {
-                                        yList.add(Float.valueOf(yArray.getString(j)));
-                                    }
-                                    injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
-                                            MotionEvent.ACTION_MOVE, this.downTime, this.downTime + aa, xList, yList, 1.0F);
+                                if (jsonArray.length() < 3) {
+                                    Log.d(TAG, "doMouseAction: drag, jsonArray.length() < 3");
+                                    return false;
                                 }
-                                float upX = Float.valueOf(jsonArray.getJSONArray(len - 1).getString(0));
-                                float upY = Float.valueOf(jsonArray.getJSONArray(len - 1).getString(1));
+                                JSONArray singlePoint = jsonArray.getJSONArray(0);
+                                Float xx = Float.valueOf(singlePoint.getString(0));
+                                Float yy = Float.valueOf(singlePoint.getString(1));
+                                long deltaTime = 0;
+                                Log.d(TAG, "doMouseAction: drag, ACTION_DOWN " + xx + ", " + yy + ", " + deltaTime);
                                 injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
-                                        MotionEvent.ACTION_UP, this.downTime, this.downTime + 70, upX, upY, 1.0F);
-                                Log.e("VysorMain", "jsonArray: " + jsonArray);
-                            } catch (JSONException e) {
+                                        MotionEvent.ACTION_DOWN, this.downTime, this.downTime, xx, yy, 1.0F);
+                                for (int i = 1; i < jsonArray.length() - 1; i++) {
+                                    Thread.sleep(deltaTime);
+                                    singlePoint = jsonArray.getJSONArray(i);
+                                    xx = Float.valueOf(singlePoint.getString(0));
+                                    yy = Float.valueOf(singlePoint.getString(1));
+                                    deltaTime = singlePoint.getLong(2);
+                                    Log.d(TAG, "doMouseAction: drag, ACTION_MOVE " + xx + ", " + yy + ", " + deltaTime);
+                                    injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_MOVE,
+                                            this.downTime, SystemClock.uptimeMillis(), xx, yy, 1.0F);
+                                }
+                                singlePoint = jsonArray.getJSONArray(jsonArray.length() - 1);
+                                xx = Float.valueOf(singlePoint.getString(0));
+                                yy = Float.valueOf(singlePoint.getString(1));
+                                deltaTime = singlePoint.getLong(2);
+                                Thread.sleep(deltaTime);
+                                Log.d(TAG, "doMouseAction: drag, ACTION_UP " + xx + ", " + yy + ", " + deltaTime);
+                                injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN, MotionEvent.ACTION_UP,
+                                        this.downTime, SystemClock.uptimeMillis(), xx, yy, 1.0F);
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
-//                            long downDelta = paramJson.optLong("downDelta", SystemClock.uptimeMillis() - this.downTime);
-//                            sendClickEvent(inputManager, injectInputEventMethod, x, y, downDelta);
                         }
                     default:
                         return false;
@@ -385,7 +353,7 @@ public class InputHelper extends BaseHelper {
                         break;
                     case "sync-frame":
 //                    if ((Main.current != null) && (Build.VERSION.SDK_INT >= 19)) {
-//                        Log.i("VysorMain", "creating sync frame");
+//                        Log.i("screenshotapp", "creating sync frame");
 //                        Main.current.requestSyncFrame();
 //                    }
                         break;

@@ -23,7 +23,7 @@ def filterPoints(points, width, height):
 def hasItem(sourceImg, templateImg, threshold, mask=None, mark=False):
     result = matchSingleTemplate(sourceImg, templateImg, threshold, mask, mark)
     print(result)
-    return len(result) > 0
+    return len(result) > 0, result
 
 
 def matchSingleTemplate(sourceImg, templateImg, threshold, mask=None, mark=False):

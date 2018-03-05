@@ -5,11 +5,11 @@
     },
     "scenes": [
         {
-            "name": "main",
+            "name": "home",
             "threshold": 0.8,
             "templates": [
                 {
-                    "path": "st#main.png",
+                    "path": "st#home.png",
                     "rect": [1500, 540, 250, 70]
                 }
             ]

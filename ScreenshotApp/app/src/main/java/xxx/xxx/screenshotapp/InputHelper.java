@@ -261,6 +261,7 @@ public class InputHelper extends BaseHelper {
                             long deltaTime = paramJson.optLong("deltaTime", SystemClock.uptimeMillis() - this.downTime);
                             sendClickEvent(inputManager, injectInputEventMethod, x, y, deltaTime);
                         }
+                        break;
                     case "drag":
                         if (!this.isDown) {
                             this.downTime = SystemClock.uptimeMillis();
@@ -300,6 +301,7 @@ public class InputHelper extends BaseHelper {
                                 e.printStackTrace();
                             }
                         }
+                        break;
                     default:
                         return false;
                 }

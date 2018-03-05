@@ -12,22 +12,27 @@ def showimg(img):
     cv.waitKey(0)
     cv.destroyAllWindows()
 
-def witchScence():
-    outputFile = "lalala.jpg"
-    getpic.downloadScreenshot(outputFile)
+
+def witchScence(sourceImg = None):
+    if not sourceImg.any():
+        getpic.downloadScreenshot("/tmp/sdafwer.jpg")
+        sourceImg = cv.imread("/tmp/sdafwer.jpg")
     for scence in Configure.getScenes():
+        points = []
         found = len(scence.templates) > 0
         for template in scence.templates:
-            sourceImg = cv.imread(outputFile)
             templateImg = cv.imread(template.path)
             # showimg(sourceImg)
             # showimg(templateImg)
-            if not matchTemplate.hasItem(sourceImg, templateImg, scence.threshold):
-                found = False
+            found, result = matchTemplate.hasItem(
+                sourceImg, templateImg, scence.threshold)
+            if found:
+                points.append(result)
+            else:
                 break
         if found:
-            return scence.name
-
+            return scence.name, points
+    return None, None
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ import json
     - st for scenseTemplates
     - eilb for enemy_icons-light_blue
 - scenes:
+    - sences: [main, precombat, subchapter]
     - templates:
         - rect: [x, y, w, h]
 '''
@@ -65,20 +66,22 @@ class Configure():
             enemyIconsList = {}
             for skey, svalue in cls.getSubchapters().items():
                 # svalue是 {"e4":{}}
-                enemyIconsList
+                enemyIconsList[skey] = {}
                 for ekey, evalue in svalue.items():
                     # evalue是{"enemy_icons": []}
-                    enemyIcons = []
-                    icons = evalue["enemy_icons"]
-                    for icon in icons:
-                        enemyIcons.append(getPath(icon))
-                    
-                    
+                    if a.has_key('enemy_icons'):
+                        enemyIcons = []
+                        icons = evalue["enemy_icons"]
+                        for icon in icons:
+                            enemyIcons.append(getPath(icon))
+                        enemyIconsList[skey][ekey] = enemyIcons
+            cls.__enemyIconsList = enemyIconsList
         return cls.__enemyIconsList
 
     @classmethod
     def getEnemyIcons(cls, chapter, subChapter):
         enemyIconsList = cls.getEnemyIconsList()
+        return enemyIconsList[chapter][subChapter]
 
 
 class Scene():
@@ -117,5 +120,5 @@ class Rect():
 if __name__ == "__main__":
     print(Configure.getScenes())
     print(Configure.getScenes()[0].templates[0].path)
-    print(Configure.getScenes()[0].templates[0].rect.x)
+    print(Configure.getEnemyIcons('s3', 'e4'))
     # print(getScene().name)

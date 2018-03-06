@@ -25,7 +25,7 @@ def witchScence(sourceImg = None):
             # showimg(sourceImg)
             # showimg(templateImg)
             found, result = matchTemplate.hasItem(
-                sourceImg, templateImg, scence.threshold)
+                sourceImg, templateImg, template.threshold)
             if found:
                 points.append(result)
             else:

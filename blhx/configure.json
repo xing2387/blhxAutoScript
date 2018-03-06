@@ -1,14 +1,16 @@
 {
     "base_dir": {
         "st": "res/scenes/templates/",
-        "eilb": "res/enemy_icons/light_blue/"
+        "eilb": "res/enemy_icons/light_blue/",
+        "scl": "res/subchapter/labels/"
     },
     "scenes": [
         {
             "name": "home",
-            "threshold": 0.8,
             "templates": [
                 {
+                    "threshold": 0.8,
+                    "name": "strike",
                     "path": "st#home.png",
                     "rect": [1500, 540, 250, 70]
                 }
@@ -16,19 +18,27 @@
         },
         {
             "name": "precombat",
-            "threshold": 0.8,
             "templates": [
                 {
+                    "threshold": 0.8,
+                    "name": "archor",
                     "path": "st#precombat.png",
                     "rect": [170, 10, 130, 60]
+                },
+                {
+                    "threshold": 0.8,
+                    "name": "delegation",
+                    "path": "st#delegation.png",
+                    "rect": [1400, 970, 200, 90]
                 }
             ]
         },
         {
             "name": "subchapter",
-            "threshold": 0.8,
             "templates": [
                 {
+                    "threshold": 0.8,
+                    "name": "battle",
                     "path": "st#subchapter.png",
                     "rect": [1600, 970, 230, 80]
                 }
@@ -36,9 +46,26 @@
         }
     ],
     "precombat": {},
-    "subchapters": {
+    "chapters": {
         "s3": {
+            "pageIndex": 3,
+            "templates":[
+                {
+                    "threshold": 0.7,
+                    "name": "slabel",
+                    "path": "scl#s3.png",
+                    "rect": [10, 130, 150, 50]
+                }
+            ],
             "e4": {
+                "templates":[
+                    {
+                        "threshold": 0.7,
+                        "name": "elabel",
+                        "path": "scl#s3e4.png",
+                        "rect": [950, 515, 160, 50]
+                    }
+                ],
                 "enemy_icons": [
                     "eilb#s.png",
                     "eilb#m.png",

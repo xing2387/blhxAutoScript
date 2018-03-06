@@ -16,15 +16,25 @@ import random
 from configurehelper import Configure, Scene, Template, Rect
 import matchTemplate
 
-def home(locations, sourceImg):
+
+def home(locations, sourceImg, subchapterName):
     pt = locations[0][0]
     x = pt[0] + 150 * random.random()
     y = pt[1] + 80 * random.random()
     inputhelper.click(x, y, round(30*random.random()))
 
-def precombat(locations, sourceImg):
-    pts = matchTemplate.matchSingleTemplate()
-    
+
+def precombat(locations, sourceImg, subchapterName):
+    print("locations: " + str(locations))
+    s, e = splitSubchapterName(subchapterName)
+    try:
+        templateFile = Configure.getChapterLabels()[s].path
+        templateImg = cv.imread(templateFile)
+        if matchTemplate.hasItem()
+    except KeyError:
+        print(subchapterName + " chapter configuration not found")
+    # Configure.getSubchapters[]
+    # pts = matchTemplate.matchSingleTemplate()
 
 
 actionFunctions = {
@@ -32,23 +42,34 @@ actionFunctions = {
     'precombat': precombat
 }
 
-def battle(enemyIcons):
+
+def splitSubchapterName(subchapterName):
+    s, e = splitSubchapter(subchapterName)
+    return 's' + s, 'e' + e
+
+
+def splitSubchapter(subchapterName):
+    return subchapterName.split('-')
+
+
+def battle(subchapterName):
     getpic.downloadScreenshot("/tmp/sdafwer.jpg")
     sourceImg = cv.imread("/tmp/sdafwer.jpg")
+    # s, e = splitSubchapterName(subchapterName)
+    # icons = Configure.getEnemyIcons(s, e)
     scence, locations = scencehelper.witchScence(sourceImg)
     if scence:
         print(scence)
-        actionFunctions[scence](locations, sourceImg)
+        actionFunctions[scence](locations, sourceImg, subchapterName)
+
 
 def main(argv):
     getpic.rootScreenshotStart()
     opts, args = getopt.getopt(argv, "c:", ["chapter="])
     for opt, arg in opts:
-        print(opts)
         if opt in ("-c", "--chapter"):
-            s, e = arg.split('-')
-            icons = Configure.getEnemyIcons('s'+s, 'e'+e)
-            battle(icons)
+            battle(arg)
+
 
 if __name__ == '__main__':
     main(sys.argv[1:])

@@ -20,8 +20,6 @@ def click(x, y, deltaTime):
     req = requests.get('http://127.0.0.1:53516/sendevent?' + params)
     print(req)
 
-
-
 def main():
     if len(sys.argv) <= 1:
         return

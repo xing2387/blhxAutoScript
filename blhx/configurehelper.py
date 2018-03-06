@@ -56,63 +56,50 @@ class Configure():
         return cls.__scenes
 
     @classmethod
-    def __parseSubchaptersConfig(cls):
-        if not cls.__enemyIconsList:
-            print("init __enemyIconsList")
-            enemyIconsList = {}
-            chapterLabels = {}
-            subchapterLabels = {}
-            chapters = {}
-            for skey, svalue in cls.getConf()["chapters"].items():
-                # svalue是 {"templates":[], "e4":{}}
-                for ekey, evalue in svalue.items():
-                    if "enemy_icons" in evalue.keys():
-                        # evalue是{"templates":[], "enemy_icons": []}
-                        enemyIconsList[skey] = {}
-                        enemyIcons = []
-                        subchapterLabels[skey] = {}
-                        for icon in evalue["enemy_icons"]:
-                            enemyIcons.append(getPath(icon))
-                        for label in evalue["templates"]:
-                            if "elabel" == label["name"]:
-                                subchapterLabels[skey][ekey] = Template(
-                                    getPath(label["path"]), label["rect"], label["name"], label["threshold"])
-                        enemyIconsList[skey][ekey] = enemyIcons
-                    elif "templates" == ekey:
-                        for label in evalue:
-                            if "slabel" == label["name"]:
-                                chapterLabels[skey] = Template(
-                                    getPath(label["path"]), label["rect"], label["name"], label["threshold"])
-                chapters[skey] = Chapter(skey, svalue[])
-            cls.__chapterLabels = chapterLabels
-            cls.__subchapterLabels = subchapterLabels
-            cls.__enemyIconsList = enemyIconsList
-            cls.__chapters = chapters
+    def getChapters(cls):
+        if not cls.__chapters:
+            print("init __chapters")
+            cls.__chapters = {}
+            chapters = cls.getConf()["chapters"]
+            for chapter in chapters:
+                cls.__chapters[chapter["name"]
+                               ] = Chapter.parseFromDict(chapter)
+        return cls.__chapters
+
+    @classmethod
+    def getChapter(cls, chapter):
+        return cls.getChapters()[chapter]
+
+    @classmethod
+    def getSubchapter(cls, chapter, subchapter):
+        return cls.getChapters()[chapter].subchapters[subchapter]
 
     @classmethod
     def getEnemyIcons(cls, chapter, subChapter):
-        if not cls.__enemyIconsList:
-            cls.__parseSubchaptersConfig()
-        return cls.__enemyIconsList[chapter][subChapter]
+        return cls.getSubchapter(chapter, subChapter).enemyIcons
 
     @classmethod
-    def getSubchapterLabels(cls, chapter):
-        if not cls.__subchapterLabels:
-            cls.__parseSubchaptersConfig()
-        return cls.__subchapterLabels
-
-    @classmethod
-    def getChapterLabels(cls):
-        if not cls.__chapterLabels:
-            cls.__parseSubchaptersConfig()
-        return cls.__chapterLabels
+    def getSubchapterLabel(cls, chapter, subChapter):
+        return cls.getSubchapter(chapter, subChapter).label
 
 
 class Subchapter():
     __slots__ = "name", "labels", "enemyIcons"
 
+    @classmethod
+    def parseFromDict(cls, dataDict):
+        subchapters = dataDict
+        name = subchapters["name"]
+        labels = []
+        for label in subchapters["templates"]["elabel"]:
+            labels.append(Template.parseFromDict(label))
+        enemyIcons = []
+        for enemyIcon in subchapters["enemy_icons"]:
+            enemyIcons.append(getPath(enemyIcon))
+        return Subchapter(name, labels, enemyIcons)
+
     def __init__(self, name, labels, enemyIcons):
-        ''' subchapters,labels is an Object List '''
+        ''' subchapters,labels is jsonArray  '''
         self.name = name
         self.labels = labels
         self.enemyIcons = enemyIcons
@@ -121,8 +108,21 @@ class Subchapter():
 class Chapter():
     __slots__ = "name", "pageIndex", "labels", "subchapters"
 
+    @classmethod
+    def parseFromDict(cls, dataDict):
+        chapter = dataDict
+        labels = []
+        subchapters = {}
+        for label in chapter["templates"]["slabel"]:
+            labels.append(Template.parseFromDict(label))
+        for subchapter in chapter["subchapters"]:
+            subchapters[subchapter["name"]
+                        ] = Subchapter.parseFromDict(subchapter)
+        name = chapter["name"]
+        pageIndex = chapter["pageIndex"]
+        return Chapter(name, pageIndex, labels, subchapters)
+
     def __init__(self, name, pageIndex, labels, subchapters):
-        ''' subchapters,labels is an Object List '''
         self.name = name
         self.pageIndex = pageIndex
         self.labels = labels
@@ -144,13 +144,15 @@ class Scene():
 class Template():
     __slots__ = "path", "rect", "name", "threshold"
 
+    @classmethod
+    def parseFromDict(cls, dataDict):
+        return Template(dataDict["path"], dataDict["rect"], dataDict["name"], dataDict["threshold"])
+
     def __init__(self, path, rect, name, threshold):
         self.rect = Rect(rect[0], rect[1], rect[2], rect[3])
         self.path = getPath(path)
         self.name = name
         self.threshold = threshold
-        # prefix, path = path.split("#")
-        # self.path = Configure.getBaseDir()[prefix] + path
 
 
 class Rect():

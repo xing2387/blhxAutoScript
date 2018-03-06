@@ -1,15 +1,16 @@
 {
     "base_dir": {
-        "st": "res/scenes/templates/",
+        "st":   "res/scenes/templates/",
         "eilb": "res/enemy_icons/light_blue/",
-        "scl": "res/subchapter/labels/"
+        "scl":  "res/subchapter/labels/",
+        "p":    "res/precombat/"
     },
     "scenes": [
         {
             "name": "home",
             "templates": [
                 {
-                    "threshold": 0.8,
+                    "threshold": 0.9,
                     "name": "strike",
                     "path": "st#home.png",
                     "rect": [1500, 540, 250, 70]
@@ -20,16 +21,27 @@
             "name": "precombat",
             "templates": [
                 {
-                    "threshold": 0.8,
+                    "threshold": 0.9,
                     "name": "archor",
                     "path": "st#precombat.png",
                     "rect": [170, 10, 130, 60]
                 },
                 {
-                    "threshold": 0.8,
+                    "threshold": 0.85,
                     "name": "delegation",
                     "path": "st#delegation.png",
                     "rect": [1400, 970, 200, 90]
+                }
+            ]
+        },
+        {
+            "name": "gofight",
+            "templates": [
+                {
+                    "name" : "gofight",
+                    "threshold": 0.9,
+                    "path": "p#gofight.png",
+                    "rect": [1280, 680, 240, 80]
                 }
             ]
         },
@@ -46,33 +58,41 @@
         }
     ],
     "precombat": {},
-    "chapters": {
-        "s3": {
+    "chapters": [
+        {
+            "name" : "s3",
             "pageIndex": 3,
-            "templates":[
-                {
-                    "threshold": 0.7,
-                    "name": "slabel",
-                    "path": "scl#s3.png",
-                    "rect": [10, 130, 150, 50]
-                }
-            ],
-            "e4": {
-                "templates":[
+            "templates": {
+                "slabel": [
                     {
+                        "name" : "slabel",
                         "threshold": 0.7,
-                        "name": "elabel",
-                        "path": "scl#s3e4.png",
-                        "rect": [950, 515, 160, 50]
+                        "path": "scl#s3.png",
+                        "rect": [10, 130, 150, 50]
                     }
-                ],
-                "enemy_icons": [
-                    "eilb#s.png",
-                    "eilb#m.png",
-                    "eilb#l.png",
-                    "eilb#boss.png"
                 ]
-            }
+            },
+            "subchapters": [
+                {
+                    "name" : "e4",
+                    "templates": {
+                        "elabel": [
+                            {
+                                "name" : "elabel",
+                                "threshold": 0.5,
+                                "path": "scl#s3e4.png",
+                                "rect": [950, 515, 160, 50]
+                            }
+                        ]
+                    },
+                    "enemy_icons": [
+                        "eilb#s.png",
+                        "eilb#m.png",
+                        "eilb#l.png",
+                        "eilb#boss.png"
+                    ]
+                }
+            ]
         }
-    }
+    ]
 }

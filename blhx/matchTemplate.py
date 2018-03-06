@@ -9,6 +9,11 @@ from multiprocessing import Pool
 import cv2 as cv
 
 
+def showimg(img):
+    cv.imshow("image1", img)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
 def filterPoints(points, width, height):
     result = []
     x1 = y1 = -10000
@@ -25,6 +30,20 @@ def hasItem(sourceImg, templateImg, threshold, mask=None, mark=False):
     print(result)
     return len(result) > 0, result
 
+def hasItemInRect(sourceImg, templateImg, threshold, rect, mask=None, mark=False):
+    result = matchSingleTemplateInRect(sourceImg, templateImg, threshold, rect, mask, mark)
+    print(result)
+    return len(result) > 0, result
+
+def matchSingleTemplateInRect(sourceImg, templateImg, threshold, rect, mask=None, mark=False):
+    sourceImg = sourceImg[rect.y:rect.y + rect.height, rect.x:rect.x + rect.width]
+    showimg(sourceImg)
+    result = matchSingleTemplate(sourceImg, templateImg, threshold, mask, mark)
+    if len(result) > 0:
+        aa = result[0]
+        aa[0] += rect.x
+        aa[1] += rect.y
+    return result
 
 def matchSingleTemplate(sourceImg, templateImg, threshold, mask=None, mark=False):
     """ looking for the position of the templateImg in the sourceImg
@@ -36,12 +55,14 @@ def matchSingleTemplate(sourceImg, templateImg, threshold, mask=None, mark=False
     # aa, threImg = cv.threshold(sourceImg, 80, 255, cv.THRESH_BINARY)
     # res = cv.matchTemplate(threImg, templateImg, cv.TM_CCOEFF_NORMED, mask)
     res = cv.matchTemplate(sourceImg, templateImg, cv.TM_CCOEFF_NORMED)
-
+    # if res.any():
+    print("matchSingleTemplate, max value: " + str(np.max(res)))
+    
     loc = np.where(res >= threshold)
     foundPoints = filterPoints(zip(*loc[::-1]), w, h)
     result = []
     for pt in foundPoints:
-        result.append((pt[0] + w/2, pt[1] + h/2))
+        result.append([pt[0] + w/2, pt[1] + h/2])
         print(res[int(pt[1]), pt[0]])
         if mark:
             print(pt)

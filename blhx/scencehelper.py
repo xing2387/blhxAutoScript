@@ -13,11 +13,20 @@ def showimg(img):
     cv.destroyAllWindows()
 
 
-def witchScence(sourceImg = None):
+def witchScence(sourceImg=None, preferStartIndex=0):
+    count = len(Configure.getScenes())
+    if preferStartIndex >= count:
+        return "halt" #返回一个不存在的场景让它报错
     if not sourceImg.any():
         getpic.downloadScreenshot("/tmp/sdafwer.jpg")
         sourceImg = cv.imread("/tmp/sdafwer.jpg")
-    for scence in Configure.getScenes():
+    
+    fistIndex = preferStartIndex - count
+    scenes = []
+    for x in range(fistIndex, preferStartIndex):
+        print("witchScence, " + str(x))
+        scenes.append(Configure.getScenes()[x])
+    for scence in scenes:
         points = []
         found = len(scence.templates) > 0
         for template in scence.templates:

@@ -3,7 +3,8 @@
         "st":   "res/scenes/templates/",
         "eilb": "res/enemy_icons/light_blue/",
         "scl":  "res/subchapter/labels/",
-        "p":    "res/precombat/"
+        "p":    "res/precombat/",
+        "b":    "res/buttons/"
     },
     "scenes": [
         {
@@ -93,6 +94,20 @@
                     ]
                 }
             ]
+        }
+    ],
+    "buttons": [
+        {
+            "name": "lastchapter",
+            "threshold": 0.85,
+            "path": "b#lastchapter.png",
+            "rect": [90, 480, 40, 120]
+        },
+        {
+            "name": "nextchapter",
+            "threshold": 0.85,
+            "path": "b#nextchapter.png",
+            "rect": [1800, 490, 40, 120]
         }
     ]
 }

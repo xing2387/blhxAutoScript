@@ -28,6 +28,7 @@ class Configure():
     __chapterLabels = None
     __subchapterLabels = None
     __chapters = None
+    __buttons = None
 
     @classmethod
     def getConf(cls):
@@ -65,6 +66,20 @@ class Configure():
                 cls.__chapters[chapter["name"]
                                ] = Chapter.parseFromDict(chapter)
         return cls.__chapters
+
+    @classmethod
+    def getButtons(cls):
+        if not cls.__buttons:
+            print("init __buttons")
+            cls.__buttons = {}
+            buttons = cls.getConf()["buttons"]
+            for button in buttons:
+                cls.__buttons[button["name"]] = Template.parseFromDict(button)
+        return cls.__buttons
+
+    @classmethod
+    def getButton(cls, name):
+        return cls.getButtons()[name]
 
     @classmethod
     def getChapter(cls, chapter):

@@ -31,13 +31,16 @@ def hasItem(sourceImg, templateImg, threshold, mask=None, mark=False):
     return len(result) > 0, result
 
 def hasItemInRect(sourceImg, templateImg, threshold, rect, mask=None, mark=False):
-    result = matchSingleTemplateInRect(sourceImg, templateImg, threshold, rect, mask, mark)
-    print(result)
-    return len(result) > 0, result
+    loc = matchSingleTemplateInRect(sourceImg, templateImg, threshold, rect, mask, mark)
+    print(loc)
+    return len(loc) > 0, loc
 
 def matchSingleTemplateInRect(sourceImg, templateImg, threshold, rect, mask=None, mark=False):
+    ''' Args:
+            rect: Object of class Rect with '__slots__ = "x", "y", "width", "height"'
+    '''
     sourceImg = sourceImg[rect.y:rect.y + rect.height, rect.x:rect.x + rect.width]
-    showimg(sourceImg)
+    # showimg(sourceImg)
     result = matchSingleTemplate(sourceImg, templateImg, threshold, mask, mark)
     if len(result) > 0:
         aa = result[0]

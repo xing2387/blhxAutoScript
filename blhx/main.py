@@ -48,12 +48,15 @@ def findChapter(subchapterName):
     imgLeftBtn = cv.imread(btnLeft.path)
     imgRightBtn = cv.imread(btnright.path)
     sourceImg = getScreenshot()
-    hasLeft, loc = matchTemplate.hasItemInRect(sourceImg, imgLeftBtn, btnLeft.threshold, btnLeft.rect)
-    hasRight, loc = matchTemplate.hasItemInRect(sourceImg, imgRightBtn, btnright.threshold, btnright.rect)
+    hasLeft, loc = matchTemplate.hasItemInRect(
+        sourceImg, imgLeftBtn, btnLeft.threshold, btnLeft.rect)
+    hasRight, loc = matchTemplate.hasItemInRect(
+        sourceImg, imgRightBtn, btnright.threshold, btnright.rect)
 
     funClickLeft = fpartial(click, x=60, y=500, w=50, h=80, deltaT=50)
     funClickRight = fpartial(click, x=1810, y=500, w=50 + 15, h=80, deltaT=50)
-    print("========================== " + str(hasLeft) + " ==== " + str(hasRight) + " ==========")
+    print("========================== " + str(hasLeft) +
+          " ==== " + str(hasRight) + " ==========")
     if not hasLeft:
         print("btn lastChapter not found")
         count = 0
@@ -70,24 +73,26 @@ def findChapter(subchapterName):
             funClickRight()
             time.sleep(2)
             count += 1
-    count = page + round(3 * random.random())
-    left = 0
+    extraRight = round(3 * random.random())
+    count = page + extraRight
+    i = count
     print("========================== click right " + str(count) + " ==========")
-    while (count > 0):
+    while (i > 0):
         clickRight = (10 * random.random()) > 1.5
         if clickRight:
             funClickRight()
             time.sleep(1.5)
-            count -= 1
-            left += 1
+            i -= 1
         else:
             funClickLeft()
             time.sleep(2)
-            count += 1
-    count = left - page 
+            i = min(count, i + 1)
+    count = extraRight
     sourceImg = getScreenshot()
-    hasLeft, loc = matchTemplate.hasItemInRect(sourceImg, imgLeftBtn, btnLeft.threshold, btnLeft.rect)
-    hasRight, loc = matchTemplate.hasItemInRect(sourceImg, imgRightBtn, btnright.threshold, btnright.rect)
+    hasLeft, loc = matchTemplate.hasItemInRect(
+        sourceImg, imgLeftBtn, btnLeft.threshold, btnLeft.rect)
+    hasRight, loc = matchTemplate.hasItemInRect(
+        sourceImg, imgRightBtn, btnright.threshold, btnright.rect)
     if not hasRight:
         print("btn lastChapter not found")
         count = 10 - page
@@ -99,8 +104,6 @@ def findChapter(subchapterName):
         time.sleep(1)
         count -= 1
 
-
-    
 
 def precombat(locations, sourceImg, subchapterName):
     print("locations: " + str(locations))
@@ -117,7 +120,8 @@ def precombat(locations, sourceImg, subchapterName):
                 sourceImg, templateImg, template.threshold, template.rect)
             if result:
                 location = location[0]
-                click(location[0], location[1], template.rect.width/2, template.rect.height/2, 70)
+                click(location[0], location[1],
+                      template.rect.width/2, template.rect.height/2, 70)
                 time.sleep(2)
                 break
             sourceImg = getScreenshot()

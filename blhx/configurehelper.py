@@ -99,25 +99,29 @@ class Configure():
 
 
 class Subchapter():
-    __slots__ = "name", "labels", "enemyIcons"
-
+    __slots__ = "name", "labels", "enemyIcons", "bossDirect", "fight"
+    ''' bossDirect, start from left top corner, clockwise [0,1,2,3,4,5,6,7,8], -1 for any where'''
+    ''' fight for "how many fight before meeting boss" '''
     @classmethod
     def parseFromDict(cls, dataDict):
-        subchapters = dataDict
-        name = subchapters["name"]
+        subchapter = dataDict
+        name = subchapter["name"]
+        bossDirect = subchapter["boss_direct"]
+        fight = subchapter["fight"]
         labels = []
-        for label in subchapters["templates"]["elabel"]:
+        for label in subchapter["templates"]["elabel"]:
             labels.append(Template.parseFromDict(label))
         enemyIcons = []
-        for enemyIcon in subchapters["enemy_icons"]:
+        for enemyIcon in subchapter["enemy_icons"]:
             enemyIcons.append(getPath(enemyIcon))
-        return Subchapter(name, labels, enemyIcons)
+        return Subchapter(name, labels, enemyIcons, bossDirect, fight)
 
-    def __init__(self, name, labels, enemyIcons):
-        ''' subchapters,labels is jsonArray  '''
+    def __init__(self, name, labels, enemyIcons, bossDirect, fight):
         self.name = name
         self.labels = labels
         self.enemyIcons = enemyIcons
+        self.bossDirect = bossDirect
+        self.fight = fight
 
 
 class Chapter():

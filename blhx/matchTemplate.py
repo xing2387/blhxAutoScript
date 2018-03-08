@@ -18,7 +18,7 @@ def filterPoints(points, width, height):
     result = []
     x1 = y1 = -10000
     for pt in points:
-        if pt[0] > x1 + width or pt[1] > y1 + height:
+        if abs(pt[0] - x1) > width or abs(pt[1] - y1) > height :
             result.append(pt)
             x1 = pt[0]
             y1 = pt[1]
@@ -59,14 +59,13 @@ def matchSingleTemplate(sourceImg, templateImg, threshold, mask=None, mark=False
     # res = cv.matchTemplate(threImg, templateImg, cv.TM_CCOEFF_NORMED, mask)
     res = cv.matchTemplate(sourceImg, templateImg, cv.TM_CCOEFF_NORMED)
     # if res.any():
-    print("matchSingleTemplate, max value: " + str(np.max(res)))
     
     loc = np.where(res >= threshold)
     foundPoints = filterPoints(zip(*loc[::-1]), w, h)
+    print("matchSingleTemplate, max value: " + str(np.max(res)) + " locs: " + str(foundPoints))
     result = []
     for pt in foundPoints:
-        result.append([pt[0] + w/2, pt[1] + h/2])
-        print(res[int(pt[1]), pt[0]])
+        result.append([pt[0], pt[1]])
         if mark:
             print(pt)
             #cv.rectangle(res, (pt[0], pt[1]), (pt[0] + w, pt[1] + h), (255,249,151), 2)
@@ -74,6 +73,16 @@ def matchSingleTemplate(sourceImg, templateImg, threshold, mask=None, mark=False
                          (pt[0] + w, pt[1] + h), (255, 249, 151), 2)
     return result
 
+
+def matchMutiTemplateInRect(sourceImg, templateImgs, threshold, rect, outFilename=None, mask=None, mark=False):
+    sourceImg = sourceImg[rect.y:rect.y + rect.height, rect.x:rect.x + rect.width]
+    # showimg(sourceImg)
+    result = matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename, mask, mark)
+    if len(result) > 0:
+        for aa in result:
+            aa[0] += rect.x
+            aa[1] += rect.y
+    return result
 
 def matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename=None, mask=None, mark=False):
     # threads = []
@@ -84,12 +93,18 @@ def matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename=None, mask
             h = h0
         if w0 < w:
             w = w0
-    points = []
+    pointsList = []
     with Pool(5) as p:
         func = functools.partial(
             matchSingleTemplate, sourceImg, threshold=threshold, mask=mask, mark=mark)
-        points = p.map(func, templateImgs)
-    result = filterPoints(points[0], w, h)
+        pointsList = p.map(func, templateImgs)
+    points = []
+    for pts in pointsList:
+        for pt in pts:
+            points.append([pt[0], pt[1]])
+    points.sort(key = lambda x:[x[0], x[1]])
+    print("~~~~~~~~~~~~~~~~~~~ " + str(points))
+    result = filterPoints(points, w, h)
     if outFilename:
         cv.imwrite(outFilename, sourceImg)
     return result

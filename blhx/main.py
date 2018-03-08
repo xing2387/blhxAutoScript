@@ -29,7 +29,7 @@ def home(locations, sourceImg, subchapterName):
     pt = locations[0][0]
     click(pt[0], pt[1], 150, 80, 30)
     time.sleep(2)
-    battle(subchapterName, 1)
+    return 1
 
 
 def getScreenshot():
@@ -129,11 +129,10 @@ def precombat(locations, sourceImg, subchapterName):
             attempt += 1
         if attempt < attemptTimes:
             time.sleep(2)
-            battle(subchapterName, 2)
+            return
 
         print("could not find subchapter label " + subchapterName)
         findChapter(subchapterName)
-        battle(subchapterName)
     except KeyError:
         print(subchapterName + " chapter configuration not found")
     # Configure.getSubchapters[]
@@ -143,18 +142,126 @@ def precombat(locations, sourceImg, subchapterName):
 def gofight(locations, sourceImg, subchapterName):
     pt = locations[0][0]
     click(pt[0], pt[1], 150, 60, 30)
-    battle(subchapterName, 3)
+    return 3
 
 
-def subchapter(locations, sourceImg, subchapterName):
+def shortEnemyPositionList(points, shortOrder):
+    ''' shortOrder: see `bossDirect` of class `Subchapter` in configurehelper.py '''
+    # points.sort(key=lambda x:[-x[0],-x[1]])
     pass
 
 
+def findEnemies(sourceImg, enemyIconsImg):
+    # print(sourceImg.shape)
+    rect = Rect(180, 0, sourceImg.shape[1] - 180, sourceImg.shape[0])
+    locs = matchTemplate.matchMutiTemplateInRect(
+        sourceImg, enemyIconsImg, 0.5, rect)
+    shortEnemyPositionList(locs, 1)
+    return locs
+
+
+def clickToFight(pt):
+    click(pt[0]+10, pt[1]+10, 140, 140, 80)
+
+
+def subchapter(locations, sourceImg, subchapterName):
+    s, e = splitSubchapterName(subchapterName)
+    subchapter = Configure.getSubchapter(s, e)
+    count = subchapter.fight
+    enemyIconsImg = []
+    for enemyIcon in subchapter.enemyIcons:
+        enemyIconsImg.append(cv.imread(enemyIcon))
+    while count > 0:
+        sourceImg = getScreenshot()
+        locs = findEnemies(sourceImg, enemyIconsImg)
+        if len(locs) <= 0:
+            # drag
+            pass
+        if subchapter.bossDirect in [3, 4, 5]:
+            clickToFight(locs[len(locs) - 1])
+            time.sleep(7)
+            return 3
+            # scence, locations = scencehelper.witchScence(getScreenshot(), 4)
+            # if scence == 'formation':
+            #     return formation(locations, sourceImg, subchapterName)
+            # else:
+            #     break
+        count -= 1
+    return 3
+
+
+def formation(locations, sourceImg, subchapterName):
+    locations = locations[0][0]
+    print(locations)
+    click(locations[0]+10, locations[1]+10, 330, 140, 80)
+
+
+def fighting(locations, sourceImg, subchapterName):
+    btnAutoFight = Configure.getButton("autofight")
+    btnAutoFightImg = cv.imread(btnAutoFight.path)
+    found, loc = matchTemplate.hasItemInRect(
+        sourceImg, btnAutoFightImg, btnAutoFight.threshold, btnAutoFight.rect)
+    if found:
+        sourceImg = getScreenshot()
+        found, loc = matchTemplate.hasItemInRect(
+            sourceImg, btnAutoFightImg, btnAutoFight.threshold, btnAutoFight.rect)
+    if found:
+        click(70, 50, 270, 60, 80)
+        time.sleep(3)
+        click(230, 450, 200, 250, 70)
+    time.sleep(50)
+    scence, locations = scencehelper.witchScence(getScreenshot())
+    while scence == 'fighting':
+        time.sleep(10)
+        scence, locations = scencehelper.witchScence(getScreenshot())
+    time.sleep(4)
+    if scence == 'victory':
+        return victory(locations, sourceImg, subchapterName)
+    else:
+        return 5
+
+
+def victory(locations, sourceImg, subchapterName):
+    click(436, 812, 1100, 240, 70)
+    time.sleep(5)
+    return 6
+
+
+def getitem(locations, sourceImg, subchapterName):
+    click(436, 812, 1100, 240, 70)
+    time.sleep(7)
+    return 7
+
+
+def getship(locations, sourceImg, subchapterName):
+    click(414, 232, 1050, 530, 70)
+    time.sleep(7)
+    return 8
+
+
+def battleend(locations, sourceImg, subchapterName):
+    click(1550, 880, 230, 70, 70)
+    time.sleep(7)
+    return 3
+
+def avoid(locations, sourceImg, subchapterName):
+    click(1200, 510, 290, 80, 70)
+    time.sleep(4)
+    return 3
+
+
 actionFunctions = {
-    'home': home,
-    'precombat': precombat,
-    'gofight': gofight,
-    'subchapter': subchapter
+    'home':         home,
+    'precombat':    precombat,
+    'gofight':      gofight,
+    'avoid':        avoid,
+    'subchapter':   subchapter,
+    'formation':    formation,
+    'fighting':     fighting,
+    'victory':      victory,
+    'getitem':      getitem,
+    'getship':      getship,
+    'battleend':    battleend
 }
 
 
@@ -168,17 +275,14 @@ def splitSubchapter(subchapterName):
 
 
 def battle(subchapterName, preferSenceIndex=0):
-    getpic.downloadScreenshot("/tmp/sdafwer.jpg")
-    sourceImg = cv.imread("/tmp/sdafwer.jpg")
-    # s, e = splitSubchapterName(subchapterName)
-    # icons = Configure.getEnemyIcons(s, e)
-    scence, locations = scencehelper.witchScence(sourceImg, preferSenceIndex)
-    if scence:
-        print(scence)
-        actionFunctions[scence](locations, sourceImg, subchapterName)
-    else:  # error, try again
-        time.sleep(2)
-        battle(subchapterName)
+    while True:
+        sourceImg = getScreenshot()
+        scence, locations = scencehelper.witchScence(sourceImg, preferSenceIndex)
+        if scence:
+            print(scence)
+            actionFunctions[scence](locations, sourceImg, subchapterName)
+        else:  # error, try again
+            time.sleep(4)
 
 
 def main(argv):

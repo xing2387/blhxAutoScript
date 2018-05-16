@@ -69,6 +69,7 @@ public class Main {
                     }
                     String requestStr = jsonObject.toString();//request.getQuery().toString();
                     response.send(requestStr);
+
                     System.out.println("/sendevent, " + requestStr);
                     InputHelper.getInputEventCallback().onStringAvailable(requestStr);
 
@@ -91,6 +92,7 @@ public class Main {
         @Override
         public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
             try {
+                response.getHeaders().set("Access-Control-Allow-Origin", "*");
                 sScreenshotHelper.getCurrentDisplaySize(point);
                 response.send(String.format(Locale.getDefault(),
                         "{ \"width\":%d , \"height\":%d }", point.x, point.y));

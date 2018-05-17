@@ -63,6 +63,7 @@ public class Main {
             @Override
             public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
                 try {
+                    response.getHeaders().set("Access-Control-Allow-Origin", "*");
                     JSONObject jsonObject = new JSONObject();
                     for (NameValuePair nameValuePair : request.getQuery()) {
                         jsonObject.put(nameValuePair.getName(), nameValuePair.getValue());

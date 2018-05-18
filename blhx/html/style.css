@@ -1,0 +1,30 @@
+.function-btn{
+	background: #666;
+}
+div{
+    display:inline-block;
+}
+.row{
+    font-size:0;
+}
+#phone{
+    left: 30px;
+}
+#back:hover{
+    src:"res/back_hover.png"
+}
+#home:hover{
+
+}
+#recent:hover{
+
+}
+#power:hover{
+
+}
+#vol_up:hover{
+
+}
+#vol_down:hover{
+
+}

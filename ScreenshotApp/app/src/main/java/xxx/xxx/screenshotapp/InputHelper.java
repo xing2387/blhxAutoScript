@@ -44,6 +44,7 @@ public class InputHelper extends BaseHelper {
         put("right", KeyEvent.KEYCODE_DPAD_RIGHT);
         put("back", KeyEvent.KEYCODE_BACK);
         put("menu", KeyEvent.KEYCODE_MENU);
+        put("recent", KeyEvent.KEYCODE_APP_SWITCH);
     }};
 
 

@@ -42,12 +42,12 @@ var screenW;
 
 var c = 0;
 function showImg() {
-    $("img").attr("src", "http://127.0.0.1:53516/screenshot.jpg?c=" + c++)
+    $("#phone").attr("src", "http://127.0.0.1:53516/screenshot.jpg?c=" + c++)
 }
 function setImgSize() {
-    var h = $(window).height() - bodyMargin;
-    $('img').height(h);
-    imgH = $('img').height();
+    var h = $(window).height() - bodyMargin - 16;
+    $("#phone").height(h);
+    imgH = $("#phone").height();
 }
 
 $(window).resize(function () {
@@ -68,19 +68,16 @@ var lastActionTime = new Date();
 var sizeUrl = "http://127.0.0.1:53516/size"
 var clickUrl = "http://127.0.0.1:53516/sendevent?type=click&clientX={x}&clientY={y}&downDelta=50"
 $(function () {
-    $('img').on("load", function () {
+    $("#phone").on("load", function () {
+        var theImage = new Image();
+        theImage.src = $("#phone").attr("src");
+        screenW = theImage.width;
+        screenH = theImage.height;
+        imgW = $("#phone").width();
+        // $(".span2").html("<br>" + imgW + "," + imgH);
         showImg();
-        $.get(sizeUrl, function (data, status) {
-            data = JSON.parse(data);
-            screenH = data.height;
-            screenW = data.width;
-            // $(".span2").html("<br>" + data.width + "," + screenH);
-
-            // alert("Data: " + data + "\nStatus: " + status);
-        });
-        imgW = $('img').width();
     });
-    $("img").bind("click", function (e) {
+    $("#phone").bind("click", function (e) {
         // var sPosPage = "(" + e.pageX + "," + e.pageY + ")";
         // var sPosScreen = "(" + e.screenX + "," + e.screenY + ")";
         // var px = Math.ceil((e.pageX - bodyMargin / 2) * screenW / imgW);
@@ -90,42 +87,61 @@ $(function () {
         // $(".span1").html("<br>" + screenW + "," + bodyMargin + "<br>Page: " + sPosPage + "<br>Screen: " + sPosScreen);
     });
 
-    $("img").mousedown(function (event) {
+    $("#phone").mousedown(function (event) {
         if (checkInterval()) {
             down = true;
             aadragstart(event);
-            lastActionTime = Date.parse(new Date());
+            lastActionTime = new Date().getTime();
         }
     });
 
-    $("img").mouseup(function (event) {
-        // if (checkInterval()) {
-        down = false;
-        aadragend(event);
-        // }
+    $("#phone").mouseout(function (event) {
+        if (down) {
+            down = false;
+            aadragend(event);
+        }
     });
-    $("img").mousemove(function (event) {
+
+    $("#phone").mouseup(function (event) {
+        if (down) {
+            down = false;
+            aadragend(event);
+        }
+    });
+
+    $("#phone").mousemove(function (event) {
         if (down && checkInterval()) {
             aadrag(event);
-            lastActionTime = Date.parse(new Date());
+            lastActionTime = new Date().getTime();
         }
+    });
+
+    $("#back").bind("click", function () {
+        $.get("http://127.0.0.1:53516/sendevent?type=back", function (data, status) {
+        });
+    });
+    $("#home").bind("click", function () {
+        $.get("http://127.0.0.1:53516/sendevent?type=home", function (data, status) {
+        });
+    });
+    $("#recent").bind("click", function () {
+        $.get("http://127.0.0.1:53516/sendevent?type=recent", function (data, status) {
+        });
     });
 })
 
 function checkInterval() {
-    return Date.parse(new Date()) - 60 > lastActionTime;
+    return new Date().getTime() - 20 > lastActionTime;
 }
 
 
 var downUrl = "http://127.0.0.1:53516/sendevent?type=mousedown&clientX={x}&clientY={y}&downDelta=50"
 function aadragstart(event) {
-    // Ev= event || window.event; 
     var px = Math.ceil((window.event.pageX - bodyMargin / 2) * screenW / imgW);
     var py = Math.ceil((window.event.pageY - bodyMargin / 2) * screenH / imgH);
     $.get(downUrl.format({ x: px, y: py }), function (data, status) {
     });
-    $(".span1").html("<br>" + px + "," + py);
-
+    // $(".span1").html("<br>" + screenW + "," + py);
 }
 
 var moveUrl = "http://127.0.0.1:53516/sendevent?type=mousemove&clientX={x}&clientY={y}&downDelta=50"
@@ -143,5 +159,3 @@ function aadragend(e) {
     $.get(upUrl.format({ x: px, y: py }), function (data, status) {
     });
 }
-
-// http://127.0.0.1:53516/sendevent?type=click&clientX=NaN&clientY=NaN&downDelta=50

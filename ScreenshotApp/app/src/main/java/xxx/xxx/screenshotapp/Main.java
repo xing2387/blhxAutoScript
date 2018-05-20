@@ -3,6 +3,7 @@ package xxx.xxx.screenshotapp;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Looper;
+import android.util.JsonReader;
 
 import com.koushikdutta.async.AsyncServer;
 import com.koushikdutta.async.http.NameValuePair;
@@ -12,9 +13,11 @@ import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
 import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
 import com.koushikdutta.async.http.server.HttpServerRequestCallback;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
@@ -42,6 +45,18 @@ public class Main {
     private static ScreenshotHelper sScreenshotHelper;
     private static InputHelper sInputHelper;
 
+    public static JSONObject reqParamToJson(AsyncHttpServerRequest request) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            for (NameValuePair nameValuePair : request.getQuery()) {
+                jsonObject.put(nameValuePair.getName(), nameValuePair.getValue());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
     public static void main(String[] args) {
 
         sScreenshotHelper = new ScreenshotHelper();
@@ -57,33 +72,23 @@ public class Main {
         System.out.println("Andcast Main Entry!");
 
         AsyncServer server = new AsyncServer();
-        httpServer.get("/screenshot.jpg", new ScreenshotRequestCallback());
+        httpServer.get("/screenshot", new ScreenshotRequestCallback());
         httpServer.get("/size", new ScreenSizeRequestCallback());
         httpServer.get("/sendevent", new HttpServerRequestCallback() {
             @Override
             public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-                try {
-                    response.getHeaders().set("Access-Control-Allow-Origin", "*");
-                    JSONObject jsonObject = new JSONObject();
-                    for (NameValuePair nameValuePair : request.getQuery()) {
-                        jsonObject.put(nameValuePair.getName(), nameValuePair.getValue());
-                    }
-                    String requestStr = jsonObject.toString();//request.getQuery().toString();
-                    response.send(requestStr);
+                response.getHeaders().set("Access-Control-Allow-Origin", "*");
+                String requestStr = reqParamToJson(request).toString();//request.getQuery().toString();
+                response.send(requestStr);
 
-                    System.out.println("/sendevent, " + requestStr);
-                    InputHelper.getInputEventCallback().onStringAvailable(requestStr);
+                System.out.println("/sendevent, " + requestStr);
+                InputHelper.getInputEventCallback().onStringAvailable(requestStr);
 
-                } catch (Exception e) {
-                    response.code(500);
-                    response.send(e.toString());
-                }
             }
         });
         httpServer.listen(server, 53516);
 
         Looper.loop();
-
     }
 
     static class ScreenSizeRequestCallback implements HttpServerRequestCallback {
@@ -105,13 +110,44 @@ public class Main {
     }
 
     static class ScreenshotRequestCallback implements HttpServerRequestCallback {
+
+        private static final String PARAM_FORMAT = "format";        //String, in jpg/png/webp
+        private static final String PARAM_QUALITY = "quality";      //int, in range [0,100]
+
+        private HashMap<String, Bitmap.CompressFormat> formatMap = new HashMap<String, Bitmap.CompressFormat>() {{
+            put("jpg", Bitmap.CompressFormat.JPEG);
+            put("png", Bitmap.CompressFormat.PNG);
+            put("webp", Bitmap.CompressFormat.WEBP);
+        }};
+
         public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
             try {
+
+                JSONObject param = reqParamToJson(request);
+
+                long t = System.currentTimeMillis();
                 Bitmap bitmap = sScreenshotHelper.screenshot();
+                System.out.println("sScreenshotHelper.screenshot() " + (System.currentTimeMillis() - t));
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bout);
+
+                String format = "jpg";
+                if (param.has(PARAM_FORMAT)) {
+                    format = param.getString(PARAM_FORMAT);
+                }
+                Bitmap.CompressFormat compressFormat = formatMap.get(format);
+                if (compressFormat == null) {
+                    compressFormat = Bitmap.CompressFormat.JPEG;
+                }
+
+                int quality = 100;
+                if (param.has(PARAM_QUALITY)) {
+                    quality = param.getInt(PARAM_QUALITY);
+                }
+
+                bitmap.compress(compressFormat, quality, bout);
                 bout.flush();
-                response.send("image/jpeg", bout.toByteArray());
+                response.send("image/" + format, bout.toByteArray());
+                System.out.println("Screenshot " + (System.currentTimeMillis() - t));
             } catch (Exception e) {
                 response.code(500);
                 response.send(e.toString());

@@ -42,7 +42,7 @@ var screenW;
 
 var c = 0;
 function showImg() {
-    $("#phone").attr("src", "http://127.0.0.1:53516/screenshot.jpg?c=" + c++)
+    $("#phone").attr("src", "http://127.0.0.1:53516/screenshot?format=jpg&quality=70&c=" + c++)
 }
 function setImgSize() {
     var h = $(window).height() - bodyMargin - 16;

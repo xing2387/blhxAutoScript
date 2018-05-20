@@ -85,7 +85,7 @@ def screenshotStop():
 def downloadScreenshot(outputFilename):
     print("downloadScreenshot ")
     if checkStarted("downloadScreenshot"):
-        req = requests.get('http://127.0.0.1:53516/screenshot.jpg')
+        req = requests.get('http://127.0.0.1:53516/screenshot?format="jpg"')
         with open(outputFilename, "wb") as outFile:
             outFile.write(req.content)
 

@@ -12,6 +12,8 @@ import android.view.DisplayInfo;
 public class ScreenshotHelper extends BaseHelper {
 
     private Point mScreenSize;
+    private float mScale = 1;       // [0f,1f]
+    private int mSize = -1;
 
     public ScreenshotHelper() {
         mScreenSize = new Point();
@@ -47,6 +49,30 @@ public class ScreenshotHelper extends BaseHelper {
         return -1;
     }
 
+    public float getScale() {
+        return mScale;
+    }
+
+    public void setScale(float scale) {
+        if (mScale == scale) {
+            return;
+        }
+        this.mSize = -1;
+        this.mScale = scale;
+    }
+
+    public void setSize(int size) {
+        if (size == mSize) {
+            return;
+        }
+        this.mScale = -1;
+        this.mSize = size;
+    }
+
+    public Point getScreenSize() {
+        return mScreenSize;
+    }
+
     @SuppressLint("PrivateApi")
     public Bitmap screenshot() throws Exception {
         getDisplayNaturalSize(mScreenSize);
@@ -56,8 +82,13 @@ public class ScreenshotHelper extends BaseHelper {
         } else {
             surfaceClassName = "android.view.SurfaceControl";
         }
+
+        if (mScale < 0) {
+            mScale = mSize <= 0 ? 1 : mSize * 1f / Math.min(mScreenSize.x, mScreenSize.y);
+        }
+
         Bitmap b = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot",
-                new Class[]{Integer.TYPE, Integer.TYPE}).invoke(null, mScreenSize.x, mScreenSize.y);
+                Integer.TYPE, Integer.TYPE).invoke(null, (int) (mScreenSize.x * mScale), (int) (mScreenSize.y * mScale));
         if (b == null) {
             throw new NullPointerException("screenshot method return null !!");
         }

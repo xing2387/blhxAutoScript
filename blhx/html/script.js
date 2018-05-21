@@ -42,7 +42,8 @@ var screenW;
 
 var c = 0;
 function showImg() {
-    $("#phone").attr("src", "http://127.0.0.1:53516/screenshot?format=jpg&quality=70&c=" + c++)
+    $("#phone").attr("src", "http://127.0.0.1:53516/screenshot?format=jpg&quality=50&size=540&c=" + c++);
+    lastShotTime = new Date().getTime();
 }
 function setImgSize() {
     var h = $(window).height() - bodyMargin - 16;
@@ -58,12 +59,13 @@ $(document).ready(function () {
     bodyMargin = $(document.body).outerHeight(true) - $(document.body).outerHeight();
     imgT = bodyMargin;
     imgL = bodyMargin;
-    setImgSize()
-    showImg()
+    setImgSize();
+    showImg();
 })
 
 var down = false;
-var lastActionTime = new Date();
+var lastActionTime = new Date().getTime();
+var lastShotTime = new Date().getTime();
 
 var sizeUrl = "http://127.0.0.1:53516/size"
 var clickUrl = "http://127.0.0.1:53516/sendevent?type=click&clientX={x}&clientY={y}&downDelta=50"
@@ -75,7 +77,13 @@ $(function () {
         screenH = theImage.height;
         imgW = $("#phone").width();
         // $(".span2").html("<br>" + imgW + "," + imgH);
-        showImg();
+        var ii = 100 - (new Date().getTime()) + lastShotTime;
+        if (ii > 0) {
+            $(".span2").html("<br> " + ii);
+            setTimeout("showImg()", ii);
+        } else {
+            showImg();
+        }
     });
     $("#phone").bind("click", function (e) {
         // var sPosPage = "(" + e.pageX + "," + e.pageY + ")";

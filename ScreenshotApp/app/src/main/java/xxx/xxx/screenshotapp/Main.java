@@ -113,6 +113,8 @@ public class Main {
 
         private static final String PARAM_FORMAT = "format";        //String, in jpg/png/webp
         private static final String PARAM_QUALITY = "quality";      //int, in range [0,100]
+        private static final String PARAM_SIZE = "size";            //int, in 480/540/720/1080
+        private static final String PARAM_SCALE = "scale";          //int, in [0f,1f]
 
         private HashMap<String, Bitmap.CompressFormat> formatMap = new HashMap<String, Bitmap.CompressFormat>() {{
             put("jpg", Bitmap.CompressFormat.JPEG);
@@ -125,11 +127,7 @@ public class Main {
 
                 JSONObject param = reqParamToJson(request);
 
-                long t = System.currentTimeMillis();
-                Bitmap bitmap = sScreenshotHelper.screenshot();
-                System.out.println("sScreenshotHelper.screenshot() " + (System.currentTimeMillis() - t));
-                ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
+                //图片格式
                 String format = "jpg";
                 if (param.has(PARAM_FORMAT)) {
                     format = param.getString(PARAM_FORMAT);
@@ -138,16 +136,38 @@ public class Main {
                 if (compressFormat == null) {
                     compressFormat = Bitmap.CompressFormat.JPEG;
                 }
-
+                //压缩质量
                 int quality = 100;
                 if (param.has(PARAM_QUALITY)) {
                     quality = param.getInt(PARAM_QUALITY);
                 }
+                //图片大小
+                int size;
+                if (param.has(PARAM_SIZE)) {
+                    size = param.getInt(PARAM_SIZE);
+                    if (size > 0) {
+                        sScreenshotHelper.setSize(size);
+                    }
+                }
+                float scale;
+                if (param.has(PARAM_SCALE)) {
+                    scale = (float) param.getDouble(PARAM_SCALE);
+                    if (scale > 0 || scale <= 1) {
+                        sScreenshotHelper.setScale(scale);
+                    }
+                }
+                
+                long t = System.currentTimeMillis();
+                Bitmap bitmap = sScreenshotHelper.screenshot();
+                System.out.println("sScreenshotHelper.screenshot() " + (System.currentTimeMillis() - t));
+                ByteArrayOutputStream bout = new ByteArrayOutputStream();
+
 
                 bitmap.compress(compressFormat, quality, bout);
                 bout.flush();
                 response.send("image/" + format, bout.toByteArray());
                 System.out.println("Screenshot " + (System.currentTimeMillis() - t));
+
             } catch (Exception e) {
                 response.code(500);
                 response.send(e.toString());

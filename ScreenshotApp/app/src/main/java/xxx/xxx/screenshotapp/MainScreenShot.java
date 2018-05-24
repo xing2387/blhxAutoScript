@@ -28,19 +28,21 @@ import java.util.Locale;
  * adb shell 命令：
  * export CLASSPATH=/data/app/xxx.xxx.screenshotapp-2/base.apk    #将CLASSPATH指向apk文件
  * #或delvik的用这个 export CLASSPATH=/data/app/$(ls /data/app |grep xxx.screenshotapp)
- * exec app_process /system/bin xxx.xxx.screenshotapp.Main '$@'
- * 转发端口
+ * exec app_process /system/bin xxx.xxx.screenshotapp.MainScreenShot '$@'
+ * 转发端口 port 53516 for example
  * adb forward tcp:53516 tcp:53516
  * 浏览器访问： 127.0.0.1:53516/screenshot.jpg
  * <p>
  * <p>
- * adb shell "x=/data/app/$(ls /data/app|grep xxx.screenshotapp);if [[ -d $x ]] then export CLASSPATH=$x/base.apk; else export CLASSPATH=$x; fi;exec app_process /system/bin xxx.xxx.screenshotapp.Main '$@'"
+ * adb shell "x=/data/app/$(ls /data/app|grep xxx.screenshotapp);if [[ -d $x ]] then export CLASSPATH=$x/base.apk; else export CLASSPATH=$x; fi;exec app_process /system/bin xxx.xxx.screenshotapp.MainScreenShot '$@'"
  * <p>
  * adb shell "x=/sdcard/Android/data/xxx.xxx.screenshotapp; if [[ ! -e $x ]] then mkdir $x;fi"
  * adb push classes.dex /sdcard/Android/data/xxx.xxx.screenshotapp/
- * adb shell "x=/sdcard/Android/data/xxx.xxx.screenshotapp; export CLASSPATH=$x/classes.dex; exec app_process $x xxx.xxx.screenshotapp.Main '$@'"
+ * adb shell "x=/sdcard/Android/data/xxx.xxx.screenshotapp; export CLASSPATH=$x/classes.dex; exec app_process $x xxx.xxx.screenshotapp.MainScreenShot '$@'"
  */
-public class Main {
+public class MainScreenShot {
+
+    private static final int PORT = 50087;
 
     private static ScreenshotHelper sScreenshotHelper;
     private static InputHelper sInputHelper;
@@ -69,7 +71,7 @@ public class Main {
         };
 
         Looper.prepare();
-        System.out.println("Andcast Main Entry!");
+        System.out.println("Andcast MainScreenShot Entry!");
 
         AsyncServer server = new AsyncServer();
         httpServer.get("/screenshot", new ScreenshotRequestCallback());
@@ -86,7 +88,7 @@ public class Main {
 
             }
         });
-        httpServer.listen(server, 53516);
+        httpServer.listen(server, PORT);
 
         Looper.loop();
     }
@@ -156,7 +158,7 @@ public class Main {
                         sScreenshotHelper.setScale(scale);
                     }
                 }
-                
+
                 long t = System.currentTimeMillis();
                 Bitmap bitmap = sScreenshotHelper.screenshot();
                 System.out.println("sScreenshotHelper.screenshot() " + (System.currentTimeMillis() - t));

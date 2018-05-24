@@ -156,7 +156,7 @@ public class InputHelper extends BaseHelper {
                     clientX = (float) paramJson.optDouble("clientX");
                     clientY = (float) paramJson.optDouble("clientY");
                     if ("wakeup".equals(eventType)) {
-//                        Main.turnScreenOn(this.val$im, paramMethod, paramIPowerManager);
+//                        MainScreenShot.turnScreenOn(this.val$im, paramMethod, paramIPowerManager);
                         return;
                     }
                 } catch (Exception e) {
@@ -212,7 +212,7 @@ public class InputHelper extends BaseHelper {
                 if ("toast".equals(eventType)) {
 //                    Intent intent = new Intent().setComponent(new ComponentName("com.koushikdutta.vysor", "com.koushikdutta.vysor.ToastReceiver"));
 //                    intent.putExtra("toast", paramJson.optString("toast"));
-////                    Main.sendBroadcast(reqParam);
+////                    MainScreenShot.sendBroadcast(reqParam);
                     return true;
                 }
                 return false;
@@ -221,10 +221,10 @@ public class InputHelper extends BaseHelper {
             private boolean doScreenRecord(String eventType) {
                 switch (eventType) {
                     case "start-recording":
-//                        Main.startRecording();
+//                        MainScreenShot.startRecording();
                         break;
                     case "stop-recording":
-//                        Main.stopRecording();
+//                        MainScreenShot.stopRecording();
                         break;
                     default:
                         return false;
@@ -349,27 +349,27 @@ public class InputHelper extends BaseHelper {
             private boolean doConfigureAction(String eventType, JSONObject paramJson) {
                 switch (eventType) {
                     case "bitrate":
-//                    int bitrate = paramJson.optInt("bitrate", Main.current.getBitrate(Integer.MAX_VALUE));
-//                    if ((Main.current != null) && (Build.VERSION.SDK_INT >= 19)) {
-//                        Main.current.setBitrate(i);
+//                    int bitrate = paramJson.optInt("bitrate", MainScreenShot.current.getBitrate(Integer.MAX_VALUE));
+//                    if ((MainScreenShot.current != null) && (Build.VERSION.SDK_INT >= 19)) {
+//                        MainScreenShot.current.setBitrate(i);
 //                    }
                         break;
                     case "sync-frame":
-//                    if ((Main.current != null) && (Build.VERSION.SDK_INT >= 19)) {
+//                    if ((MainScreenShot.current != null) && (Build.VERSION.SDK_INT >= 19)) {
 //                        Log.i("screenshotapp", "creating sync frame");
-//                        Main.current.requestSyncFrame();
+//                        MainScreenShot.current.requestSyncFrame();
 //                    }
                         break;
                     case "resolution":
-//                        Main.resolution = paramJson.optDouble("resolution", 0.0D);
-//                        Main.encodeSizeThrottle.postThrottled(null);
+//                        MainScreenShot.resolution = paramJson.optDouble("resolution", 0.0D);
+//                        MainScreenShot.encodeSizeThrottle.postThrottled(null);
                         break;
                     case "displaySettings":
-//                        Main.setSizeAndDensity(paramJson);
-//                        Main.sendDisplayInfo();
+//                        MainScreenShot.setSizeAndDensity(paramJson);
+//                        MainScreenShot.sendDisplayInfo();
                         break;
                     case "dimDisplay":
-//                        Main.dimDisplay(paramJson.optBoolean("dimDisplay", false));
+//                        MainScreenShot.dimDisplay(paramJson.optBoolean("dimDisplay", false));
                         break;
                     default:
                         return false;

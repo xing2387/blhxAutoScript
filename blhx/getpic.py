@@ -24,7 +24,8 @@ def screenshotStart():
     print("screenshotStart ")
     if checkProcessExist():
         return
-    os.system('adb forward tcp:53516 tcp:53516')
+    os.system('adb forward tcp:50087 tcp:50087')
+    os.system('adb forward tcp:50088 tcp:50088')
     os.system(
         "adb shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; if [[ ! -e $x ]] then mkdir $x;fi'"
     )
@@ -34,7 +35,8 @@ def screenshotStart():
         '''
         adb shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; 
             export CLASSPATH=$x/classes.dex; 
-            exec app_process $x xxx.xxx.screenshotapp.Main' >/dev/null &
+            exec app_process $x xxx.xxx.screenshotapp.MainScreenShot & 
+            exec app_process $x xxx.xxx.screenshotapp.MainControl & ' >/dev/null &
         '''
     )
     time.sleep(3)   #wait for the service start
@@ -44,7 +46,7 @@ def rootScreenshotStart():
     print("screenshotStart ")
     if checkProcessExist():
         return
-    os.system('adb forward tcp:53516 tcp:53516')
+    os.system('adb forward tcp:50087 tcp:50087')
     os.system(
         '''
         adb shell 'x=/data/app/$(su -c "ls /data/app|grep xxx.screenshotapp");
@@ -53,7 +55,8 @@ def rootScreenshotStart():
             else 
                 export CLASSPATH=$x; 
             fi;
-            exec app_process /system/bin xxx.xxx.screenshotapp.Main' &
+            exec app_process /system/bin xxx.xxx.screenshotapp.MainScreenShot;
+            exec app_process /system/bin xxx.xxx.screenshotapp.MainControl' &
         '''
     )
     time.sleep(3)   #wait for the service start
@@ -61,7 +64,7 @@ def rootScreenshotStart():
 
 
 def checkProcessExist():
-    result = os.system('adb shell "netstat -tnl | grep 53516"')
+    result = os.system('adb shell "netstat -tnl | grep 500"')
     Started.setStarted(result == 0)
     print("checkProcessExist: " + str(result == 0))
     return Started.isStarted()
@@ -77,7 +80,7 @@ def screenshotStop():
     print("screenshotStop ")
     if checkStarted("screenshotStop"):
         os.system(
-            '''adb shell "netstat -tunlp 2>/dev/null |grep 53516 | awk '{print \$NF}' | cut -d / -f 1 | xargs kill -9"'''
+            '''adb shell "netstat -tunlp 2>/dev/null |grep 50087 | awk '{print \$NF}' | cut -d / -f 1 | xargs kill -9"'''
         )
     time.sleep(3)   #wait for the service stop
 
@@ -85,7 +88,7 @@ def screenshotStop():
 def downloadScreenshot(outputFilename):
     print("downloadScreenshot ")
     if checkStarted("downloadScreenshot"):
-        req = requests.get('http://127.0.0.1:53516/screenshot?format="jpg"')
+        req = requests.get('http://127.0.0.1:50087/screenshot?format="jpg"')
         with open(outputFilename, "wb") as outFile:
             outFile.write(req.content)
 

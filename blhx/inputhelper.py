@@ -17,7 +17,7 @@ def click(x, y, deltaTime):
     params = "type=click&clientX=%(x)f&clientY=%(y)f&downDelta=%(deltaTime)d" % {
         'x': x, 'y': y, 'deltaTime': deltaTime}
     print("click " + params)
-    req = requests.get('http://127.0.0.1:53516/sendevent?' + params)
+    req = requests.get('http://127.0.0.1:50087/sendevent?' + params)
     print(req)
 
 def main():

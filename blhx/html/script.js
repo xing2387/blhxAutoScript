@@ -31,6 +31,12 @@ String.prototype.format = function (args) {
     return result;
 }
 
+var screenshotPort = 50087;
+var controlPort = 50088;
+var screenshotBaseUrl = "http://127.0.0.1:" + screenshotPort + "/";
+var controlBaseUrl = "http://127.0.0.1:" + controlPort + "/";
+
+
 var bodyMargin;
 var imgT;
 var imgL;
@@ -40,11 +46,25 @@ var imgW;
 var screenH;
 var screenW;
 
+var scale = 1;
+var picSize = 540;
+
 var c = 0;
+
 function showImg() {
-    $("#phone").attr("src", "http://127.0.0.1:53516/screenshot?format=jpg&quality=50&size=540&c=" + c++);
+    $("#phone").attr("src", screenshotBaseUrl + "screenshot?format=jpg&size=540&quality=50&c=" + c++);//&size=1080
     lastShotTime = new Date().getTime();
 }
+
+var sizeUrl = screenshotBaseUrl + "size"
+function initScale() {
+    $.getJSON(sizeUrl, function (obj) {
+        var minSize = Math.min(obj.width, obj.height);
+        scale = picSize / minSize;
+        // $(".span1").html("<br>" + scale);
+    });
+}
+
 function setImgSize() {
     var h = $(window).height() - bodyMargin - 16;
     $("#phone").height(h);
@@ -61,14 +81,15 @@ $(document).ready(function () {
     imgL = bodyMargin;
     setImgSize();
     showImg();
+    initScale();
 })
 
 var down = false;
 var lastActionTime = new Date().getTime();
 var lastShotTime = new Date().getTime();
 
-var sizeUrl = "http://127.0.0.1:53516/size"
-var clickUrl = "http://127.0.0.1:53516/sendevent?type=click&clientX={x}&clientY={y}&downDelta=50"
+
+var clickUrl = controlBaseUrl + "sendevent?type=click&clientX={x}&clientY={y}&downDelta=50"
 $(function () {
     $("#phone").on("load", function () {
         var theImage = new Image();
@@ -79,21 +100,21 @@ $(function () {
         // $(".span2").html("<br>" + imgW + "," + imgH);
         var ii = 100 - (new Date().getTime()) + lastShotTime;
         if (ii > 0) {
-            $(".span2").html("<br> " + ii);
+            // $(".span2").html("<br> " + ii);
             setTimeout("showImg()", ii);
         } else {
             showImg();
         }
     });
-    $("#phone").bind("click", function (e) {
-        // var sPosPage = "(" + e.pageX + "," + e.pageY + ")";
-        // var sPosScreen = "(" + e.screenX + "," + e.screenY + ")";
-        // var px = Math.ceil((e.pageX - bodyMargin / 2) * screenW / imgW);
-        // var py = Math.ceil((e.pageY - bodyMargin / 2) * screenH / imgH);
-        // $.get(clickUrl.format({ x: px, y: py }), function (data, status) {
-        // });
-        // $(".span1").html("<br>" + screenW + "," + bodyMargin + "<br>Page: " + sPosPage + "<br>Screen: " + sPosScreen);
-    });
+    // $("#phone").bind("click", function (e) {
+    //     // var sPosPage = "(" + e.pageX + "," + e.pageY + ")";
+    //     // var sPosScreen = "(" + e.screenX + "," + e.screenY + ")";
+    //     var px = Math.ceil((e.pageX - bodyMargin / 2) * screenW / imgW);
+    //     var py = Math.ceil((e.pageY - bodyMargin / 2) * screenH / imgH);
+    //     $.get(clickUrl.format({ x: px, y: py }), function (data, status) {
+    //     });
+    //     // $(".span1").html("<br>" + screenW + "," + bodyMargin + "<br>Page: " + sPosPage + "<br>Screen: " + sPosScreen);
+    // });
 
     $("#phone").mousedown(function (event) {
         if (checkInterval()) {
@@ -125,15 +146,15 @@ $(function () {
     });
 
     $("#back").bind("click", function () {
-        $.get("http://127.0.0.1:53516/sendevent?type=back", function (data, status) {
+        $.get(controlBaseUrl + "sendevent?type=back", function (data, status) {
         });
     });
     $("#home").bind("click", function () {
-        $.get("http://127.0.0.1:53516/sendevent?type=home", function (data, status) {
+        $.get(controlBaseUrl + "sendevent?type=home", function (data, status) {
         });
     });
     $("#recent").bind("click", function () {
-        $.get("http://127.0.0.1:53516/sendevent?type=recent", function (data, status) {
+        $.get(controlBaseUrl + "sendevent?type=recent", function (data, status) {
         });
     });
 })
@@ -143,27 +164,33 @@ function checkInterval() {
 }
 
 
-var downUrl = "http://127.0.0.1:53516/sendevent?type=mousedown&clientX={x}&clientY={y}&downDelta=50"
+var downUrl = controlBaseUrl + "sendevent?type=mousedown&clientX={x}&clientY={y}&downDelta=50"
 function aadragstart(event) {
     var px = Math.ceil((window.event.pageX - bodyMargin / 2) * screenW / imgW);
     var py = Math.ceil((window.event.pageY - bodyMargin / 2) * screenH / imgH);
+    px /= scale;
+    py /= scale;
     $.get(downUrl.format({ x: px, y: py }), function (data, status) {
     });
     // $(".span1").html("<br>" + screenW + "," + py);
 }
 
-var moveUrl = "http://127.0.0.1:53516/sendevent?type=mousemove&clientX={x}&clientY={y}&downDelta=50"
+var moveUrl = controlBaseUrl + "sendevent?type=mousemove&clientX={x}&clientY={y}&downDelta=50"
 function aadrag(e) {
     var px = Math.ceil((e.pageX - bodyMargin / 2) * screenW / imgW);
     var py = Math.ceil((e.pageY - bodyMargin / 2) * screenH / imgH);
+    px /= scale;
+    py /= scale;
     $.get(moveUrl.format({ x: px, y: py }), function (data, status) {
     });
 }
 
-var upUrl = "http://127.0.0.1:53516/sendevent?type=mouseup&clientX={x}&clientY={y}&downDelta=50"
+var upUrl = controlBaseUrl + "sendevent?type=mouseup&clientX={x}&clientY={y}&downDelta=50"
 function aadragend(e) {
     var px = Math.ceil((e.pageX - bodyMargin / 2) * screenW / imgW);
     var py = Math.ceil((e.pageY - bodyMargin / 2) * screenH / imgH);
+    px /= scale;
+    py /= scale;
     $.get(upUrl.format({ x: px, y: py }), function (data, status) {
     });
 }

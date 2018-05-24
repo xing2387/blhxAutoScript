@@ -52,7 +52,7 @@ var picSize = 540;
 var c = 0;
 
 function showImg() {
-    $("#phone").attr("src", screenshotBaseUrl + "screenshot?format=jpg&size=540&quality=50&c=" + c++);//&size=1080
+    $("#phone").attr("src", screenshotBaseUrl + "screenshot?format=jpg&size=540&quality=30&c=" + c++);//&size=1080
     lastShotTime = new Date().getTime();
 }
 
@@ -98,7 +98,7 @@ $(function () {
         screenH = theImage.height;
         imgW = $("#phone").width();
         // $(".span2").html("<br>" + imgW + "," + imgH);
-        var ii = 100 - (new Date().getTime()) + lastShotTime;
+        var ii = 80 - (new Date().getTime()) + lastShotTime;
         if (ii > 0) {
             // $(".span2").html("<br> " + ii);
             setTimeout("showImg()", ii);

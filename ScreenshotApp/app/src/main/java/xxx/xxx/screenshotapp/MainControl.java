@@ -51,7 +51,7 @@ public class MainControl {
                 String requestStr = reqParamToJson(request).toString();//request.getQuery().toString();
                 response.send(requestStr);
 
-                System.out.println("/sendevent, " + requestStr);
+//                System.out.println("/sendevent, " + requestStr);
                 InputHelper.getInputEventCallback().onStringAvailable(requestStr);
 
             }

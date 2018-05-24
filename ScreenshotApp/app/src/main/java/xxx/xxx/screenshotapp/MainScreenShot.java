@@ -83,7 +83,7 @@ public class MainScreenShot {
                 String requestStr = reqParamToJson(request).toString();//request.getQuery().toString();
                 response.send(requestStr);
 
-                System.out.println("/sendevent, " + requestStr);
+//                System.out.println("/sendevent, " + requestStr);
                 InputHelper.getInputEventCallback().onStringAvailable(requestStr);
 
             }
@@ -161,14 +161,14 @@ public class MainScreenShot {
 
                 long t = System.currentTimeMillis();
                 Bitmap bitmap = sScreenshotHelper.screenshot();
-                System.out.println("sScreenshotHelper.screenshot() " + (System.currentTimeMillis() - t));
+//                System.out.println("sScreenshotHelper.screenshot() " + (System.currentTimeMillis() - t));
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
 
                 bitmap.compress(compressFormat, quality, bout);
                 bout.flush();
                 response.send("image/" + format, bout.toByteArray());
-                System.out.println("Screenshot " + (System.currentTimeMillis() - t));
+//                System.out.println("Screenshot " + (System.currentTimeMillis() - t));
 
             } catch (Exception e) {
                 response.code(500);

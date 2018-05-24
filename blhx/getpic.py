@@ -19,52 +19,59 @@ class Started():
     def setStarted(cls, started):
         cls.__started = started
 
+def getAdbCommend(device):
+    if not device:
+        return "adb "
+    else:
+        return "adb -s " + device + " "
 
-def screenshotStart():
+def screenshotStart(device):
     print("screenshotStart ")
-    if checkProcessExist():
+    adb = getAdbCommend(device)
+    if checkProcessExist(device):
         return
-    os.system('adb forward tcp:50087 tcp:50087')
-    os.system('adb forward tcp:50088 tcp:50088')
+    os.system(adb + ' forward tcp:50087 tcp:50087')
+    os.system(adb + ' forward tcp:50088 tcp:50088')
     os.system(
-        "adb shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; if [[ ! -e $x ]] then mkdir $x;fi'"
+        adb + " shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; if [[ ! -e $x ]] then mkdir $x;fi'"
     )
     os.system(
-        'adb push classes.dex /sdcard/Android/data/xxx.xxx.screenshotapp/')
+        adb + ' push classes.dex /sdcard/Android/data/xxx.xxx.screenshotapp/')
     os.system(
-        '''
-        adb shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; 
+        adb + ''' shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; 
             export CLASSPATH=$x/classes.dex; 
             exec app_process $x xxx.xxx.screenshotapp.MainScreenShot & 
-            exec app_process $x xxx.xxx.screenshotapp.MainControl & ' >/dev/null &
+            exec app_process $x xxx.xxx.screenshotapp.MainControl & '  &
         '''
     )
     time.sleep(3)   #wait for the service start
     Started.setStarted(True)
 
-def rootScreenshotStart():
+def rootScreenshotStart(device):
     print("screenshotStart ")
-    if checkProcessExist():
+    if checkProcessExist(device):
         return
     os.system('adb forward tcp:50087 tcp:50087')
+    os.system('adb forward tcp:50088 tcp:50088')
     os.system(
         '''
         adb shell 'x=/data/app/$(su -c "ls /data/app|grep xxx.screenshotapp");
             if [[ -d $x ]] then
                 export CLASSPATH=$x/base.apk;
             else 
-                export CLASSPATH=$x; 
+                export CLASSPATH=$x;
             fi;
-            exec app_process /system/bin xxx.xxx.screenshotapp.MainScreenShot;
-            exec app_process /system/bin xxx.xxx.screenshotapp.MainControl' &
+            exec app_process /system/bin xxx.xxx.screenshotapp.MainScreenShot &
+            exec app_process /system/bin xxx.xxx.screenshotapp.MainControl & ' &
         '''
     )
     time.sleep(3)   #wait for the service start
     Started.setStarted(True)
 
 
-def checkProcessExist():
-    result = os.system('adb shell "netstat -tnl | grep 500"')
+def checkProcessExist(device):
+    adb = getAdbCommend(device)
+    result = os.system(adb + ' shell "netstat -tnl | grep 5008"')
     Started.setStarted(result == 0)
     print("checkProcessExist: " + str(result == 0))
     return Started.isStarted()
@@ -76,18 +83,29 @@ def checkStarted(tag=""):
     return Started.isStarted()
 
 
-def screenshotStop():
+def screenshotStop(device):
     print("screenshotStop ")
-    if checkStarted("screenshotStop"):
+    if checkProcessExist(device):
         os.system(
             '''adb shell "netstat -tunlp 2>/dev/null |grep 50087 | awk '{print \$NF}' | cut -d / -f 1 | xargs kill -9"'''
         )
-    time.sleep(3)   #wait for the service stop
+        os.system(
+            '''adb shell "netstat -tunlp 2>/dev/null |grep 50088 | awk '{print \$NF}' | cut -d / -f 1 | xargs kill -9"'''
+        )
 
+def screenshotStop2(device):
+    print("screenshotStop2 ")
+    if checkProcessExist(device):
+        os.system(
+            '''adb shell "ps |grep app_process | awk '{print \$2}' | xargs kill -9"'''
+        )
+        os.system(
+            '''adb shell "ps |grep app_process | awk '{print \$2}' | xargs kill -9"'''
+        )
 
-def downloadScreenshot(outputFilename):
+def downloadScreenshot(device):
     print("downloadScreenshot ")
-    if checkStarted("downloadScreenshot"):
+    if checkProcessExist(device):
         req = requests.get('http://127.0.0.1:50087/screenshot?format="jpg"')
         with open(outputFilename, "wb") as outFile:
             outFile.write(req.content)
@@ -95,14 +113,18 @@ def downloadScreenshot(outputFilename):
 
 if __name__ == "__main__":
     action = sys.argv[1]
+    if len(sys.argv) == 2:
+        sys.argv.append(None)
     if "start" == action:
-        screenshotStart()
+        screenshotStart(sys.argv[2])
     elif "root" == action:
-        rootScreenshotStart()
+        rootScreenshotStart(sys.argv[2])
     elif "stop" == action:
-        screenshotStop()
+        screenshotStop(sys.argv[2])
+    elif "stop2" == action:
+        screenshotStop(sys.argv[2])
     elif "check" == action:
-        checkProcessExist()
+        checkProcessExist(sys.argv[2])
     elif "shot" == action:
         downloadScreenshot(sys.argv[2])
     # checkProcessExist()

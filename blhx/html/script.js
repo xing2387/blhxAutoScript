@@ -77,8 +77,6 @@ $(window).resize(function () {
 
 $(document).ready(function () {
     bodyMargin = $(document.body).outerHeight(true) - $(document.body).outerHeight();
-    imgT = bodyMargin;
-    imgL = bodyMargin;
     setImgSize();
     showImg();
     initScale();
@@ -97,7 +95,9 @@ $(function () {
         screenW = theImage.width;
         screenH = theImage.height;
         imgW = $("#phone").width();
-        // $(".span2").html("<br>" + imgW + "," + imgH);
+        imgT = $("#phone").offset().top;
+        imgL = $("#phone").offset().left;
+        // $(".span2").html("<br>" + $("#phone").offset().left + "," + $("#phone").offset().top);
         var ii = 80 - (new Date().getTime()) + lastShotTime;
         if (ii > 0) {
             // $(".span2").html("<br> " + ii);
@@ -160,16 +160,15 @@ $(function () {
 })
 
 function checkInterval() {
-    return new Date().getTime() - 20 > lastActionTime;
+    return new Date().getTime() - 40 > lastActionTime;
 }
 
 
 var downUrl = controlBaseUrl + "sendevent?type=mousedown&clientX={x}&clientY={y}&downDelta=50"
-function aadragstart(event) {
-    var px = Math.ceil((window.event.pageX - bodyMargin / 2) * screenW / imgW);
-    var py = Math.ceil((window.event.pageY - bodyMargin / 2) * screenH / imgH);
-    px /= scale;
-    py /= scale;
+function aadragstart(e) {
+    var px = Math.ceil((e.pageX - imgL) * screenW / imgW / scale);
+    var py = Math.ceil((e.pageY - imgT) * screenH / imgH / scale);
+    // $(".span2").html("<br>" + $("#phone").offset().left + "," + $("#phone").offset().top);
     $.get(downUrl.format({ x: px, y: py }), function (data, status) {
     });
     // $(".span1").html("<br>" + screenW + "," + py);
@@ -177,20 +176,16 @@ function aadragstart(event) {
 
 var moveUrl = controlBaseUrl + "sendevent?type=mousemove&clientX={x}&clientY={y}&downDelta=50"
 function aadrag(e) {
-    var px = Math.ceil((e.pageX - bodyMargin / 2) * screenW / imgW);
-    var py = Math.ceil((e.pageY - bodyMargin / 2) * screenH / imgH);
-    px /= scale;
-    py /= scale;
+    var px = Math.ceil((e.pageX - imgL) * screenW / imgW / scale);
+    var py = Math.ceil((e.pageY - imgT) * screenH / imgH / scale);
     $.get(moveUrl.format({ x: px, y: py }), function (data, status) {
     });
 }
 
 var upUrl = controlBaseUrl + "sendevent?type=mouseup&clientX={x}&clientY={y}&downDelta=50"
 function aadragend(e) {
-    var px = Math.ceil((e.pageX - bodyMargin / 2) * screenW / imgW);
-    var py = Math.ceil((e.pageY - bodyMargin / 2) * screenH / imgH);
-    px /= scale;
-    py /= scale;
+    var px = Math.ceil((e.pageX - imgL) * screenW / imgW / scale);
+    var py = Math.ceil((e.pageY - imgT) * screenH / imgH / scale);
     $.get(upUrl.format({ x: px, y: py }), function (data, status) {
     });
 }

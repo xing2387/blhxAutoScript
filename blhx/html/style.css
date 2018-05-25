@@ -4,6 +4,9 @@
 div{
     display:inline-block;
 }
+body{
+    direction: rtl;
+}
 .row{
     font-size:0;
 }

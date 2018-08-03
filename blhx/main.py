@@ -286,7 +286,7 @@ def battle(subchapterName, preferSenceIndex=0):
 
 
 def main(argv):
-    getpic.rootScreenshotStart()
+    getpic.screenshotStart()
     opts, args = getopt.getopt(argv, "c:", ["chapter="])
     for opt, arg in opts:
         if opt in ("-c", "--chapter"):

@@ -31,10 +31,12 @@ String.prototype.format = function (args) {
     return result;
 }
 
+// var host = "127.0.0.1";
+var host = "192.168.2.1";
 var screenshotPort = 50087;
 var controlPort = 50088;
-var screenshotBaseUrl = "http://127.0.0.1:" + screenshotPort + "/";
-var controlBaseUrl = "http://127.0.0.1:" + controlPort + "/";
+var screenshotBaseUrl = "http://" + host + ":" + screenshotPort + "/";
+var controlBaseUrl =  "http://" + host + ":" + controlPort + "/";
 
 
 var bodyMargin;

@@ -134,9 +134,10 @@ class Chapter():
         subchapters = {}
         for label in chapter["templates"]["slabel"]:
             labels.append(Template.parseFromDict(label))
-        for subchapter in chapter["subchapters"]:
-            subchapters[subchapter["name"]
-                        ] = Subchapter.parseFromDict(subchapter)
+        if not chapter["subchapters"]:
+            for subchapter in chapter["subchapters"]:
+                subchapters[subchapter["name"]
+                            ] = Subchapter.parseFromDict(subchapter)
         name = chapter["name"]
         pageIndex = chapter["pageIndex"]
         return Chapter(name, pageIndex, labels, subchapters)

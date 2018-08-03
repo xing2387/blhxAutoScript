@@ -27,6 +27,7 @@ def witchScence(sourceImg, preferStartIndex=0):
         found = len(scence.templates) > 0
         for template in scence.templates:
             templateImg = cv.imread(template.path)
+            print(template.path)
             # showimg(sourceImg)
             # showimg(templateImg)
             found, result = matchTemplate.hasItem(

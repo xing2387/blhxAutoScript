@@ -17,10 +17,17 @@ import matchTemplate
 
 
 def click(x, y, w, h, deltaT):
+    print("click " + str(x) + ", " + str(y) + ", " + str(w) + ", " + str(h))
     x = x + w * random.random()
     y = y + h * random.random()
     inputhelper.click(x, y, round(deltaT*random.random()))
 
+def clickBtn(btn, xy=None):
+    if not xy:
+        click(btn.rect.x, btn.rect.y, btn.rect.width, btn.rect.height, 50)
+    else:
+        click(xy[0], xy[1], btn.rect.width, btn.rect.height, 50)
+    
 
 def showimg(img):
     cv.imshow("image1", img)
@@ -32,10 +39,20 @@ def getScreenshot():
     getpic.downloadScreenshot("/tmp/sdafwer.jpg")
     return cv.imread("/tmp/sdafwer.jpg")
 
-def home():
-    None
+def findBtn(sourceImg, btn):
+    btnImg = cv.imread(btn.path)
+    return matchTemplate.hasItem(sourceImg, btnImg, btn.threshold)
 
-def explore():
+def home(locations, sourceImg, subchapterName):
+    btnExplorer = Configure.getButton("explore")
+    found, loc = findBtn(sourceImg, btnExplorer)
+    if found:
+        clickBtn(btnExplorer, [loc[0][0], loc[0][1]])
+    time.sleep(2)
+
+def explore(locations, sourceImg, chapterName):
+    chapterLabel = Configure.getChapter(chapterName).labels[0]
+    print(chapterLabel)
     None
 
 actionFunctions = {
@@ -43,42 +60,18 @@ actionFunctions = {
     'explore':    explore
 }
 
-def witchScence(scenes, sourceImg, preferStartIndex=0):
-    if preferStartIndex >= len(scenes):
-        return "halt" #返回一个不存在的场景让它报错
-    
-    fistIndex = preferStartIndex - len(scenes)
-    for scence in scenes:
-        points = []
-        found = len(scence.templates) > 0
-        for template in scence.templates:
-            templateImg = cv.imread(template.path)
-            # showimg(sourceImg)
-            # showimg(templateImg)
-            found, result = matchTemplate.hasItem(
-                sourceImg, templateImg, template.threshold)
-            if found:
-                points.append(result)
-            else:
-                break
-        if found:
-            return scence.name, points
-    return None, None
-
-
-def battle(chapter):
-    # while(True):
-    None
+def battle(chapterName, preferSenceIndex=0):
+    while True:
+        sourceImg = getScreenshot()
+        scence, locations = scencehelper.witchScence(sourceImg, preferSenceIndex)
+        if scence:
+            print(scence)
+            actionFunctions[scence](locations, sourceImg, chapterName)
+        else:  # error, try again
+            time.sleep(4)
 
 def main(argv):
-    # getpic.rootScreenshotStart()
-    img = getScreenshot()
-    templateImg = cv.imread("res_yys/chapter/c18.jpg")
-    rec = matchTemplate.matchSingleTemplate(img, templateImg, 0.9)[0]
-    size = templateImg.shape[:2]
-    click(rec[0], rec[1], size[1], size[0], 50)
-    print(rec)
-    # showimg(img)
+    getpic.screenshotStart()
     opts, args = getopt.getopt(argv, "c:", ["chapter="])
     for opt, arg in opts:
         if opt in ("-c", "--chapter"):

@@ -159,9 +159,6 @@ $(function () {
         $.get(controlBaseUrl + "sendevent?type=recent", function (data, status) {
         });
     });
-    // $("#phone").bind("keypress", function(event) {
-    //     alert("keypress" + event);
-    // });
     $("body")
         .keydown(function (event) {
             var keycode = event.keyCode;
@@ -171,10 +168,13 @@ $(function () {
             } else if (keycode == 8) {
                 $.get(controlBaseUrl + "sendevent?type=backspace", function (data, status) {
                 });
+            } else if (keycode == 192) { //`
+                $.get(controlBaseUrl + "sendevent?type=back", function (data, status) {
+                });
             } else if (keycode == 16 || keycode == 18) {
 
-            } else {
-                sendKeyChar(event.originalEvent.key);
+            } else if (event.originalEvent.key.length == 1) {
+                sendKeyChar(event);
             }
             console.log(event);
         });
@@ -221,13 +221,4 @@ var charUrl = controlBaseUrl + "sendevent?type=keychar&keychar={char}"
 function sendKeyChar(char) {
     $.get(charUrl.format({ char: char }), function (data, status) {
     });
-}
-
-function toast(mess) {
-    var str = '<div class="mess"><span></span></div>';
-    $("body").append(str);
-    $(".mess").find("span").text(mess);
-    setTimeout(function () {
-        $(".mess").remove();
-    }, 2000)
 }

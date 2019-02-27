@@ -36,7 +36,7 @@ var host = "192.168.2.1";
 var screenshotPort = 50087;
 var controlPort = 50088;
 var screenshotBaseUrl = "http://" + host + ":" + screenshotPort + "/";
-var controlBaseUrl =  "http://" + host + ":" + controlPort + "/";
+var controlBaseUrl = "http://" + host + ":" + controlPort + "/";
 
 
 var bodyMargin;
@@ -100,13 +100,13 @@ $(function () {
         imgT = $("#phone").offset().top;
         imgL = $("#phone").offset().left;
         // $(".span2").html("<br>" + $("#phone").offset().left + "," + $("#phone").offset().top);
-        var ii = 80 - (new Date().getTime()) + lastShotTime;
-        if (ii > 0) {
-            // $(".span2").html("<br> " + ii);
-            setTimeout("showImg()", ii);
-        } else {
-            showImg();
-        }
+        //    var ii = 80 - (new Date().getTime()) + lastShotTime;
+        //    if (ii > 0) {
+        // $(".span2").html("<br> " + ii);
+        //        setTimeout("showImg()", ii);
+        //    } else {
+        showImg();
+        //    }
     });
     // $("#phone").bind("click", function (e) {
     //     // var sPosPage = "(" + e.pageX + "," + e.pageY + ")";
@@ -159,6 +159,25 @@ $(function () {
         $.get(controlBaseUrl + "sendevent?type=recent", function (data, status) {
         });
     });
+    // $("#phone").bind("keypress", function(event) {
+    //     alert("keypress" + event);
+    // });
+    $("body")
+        .keydown(function (event) {
+            var keycode = event.keyCode;
+            if (keycode == 46) {
+                $.get(controlBaseUrl + "sendevent?type=delete", function (data, status) {
+                });
+            } else if (keycode == 8) {
+                $.get(controlBaseUrl + "sendevent?type=backspace", function (data, status) {
+                });
+            } else if (keycode == 16 || keycode == 18) {
+
+            } else {
+                sendKeyChar(event.originalEvent.key);
+            }
+            console.log(event);
+        });
 })
 
 function checkInterval() {
@@ -190,4 +209,25 @@ function aadragend(e) {
     var py = Math.ceil((e.pageY - imgT) * screenH / imgH / scale);
     $.get(upUrl.format({ x: px, y: py }), function (data, status) {
     });
+}
+
+var keycodeUrl = controlBaseUrl + "sendevent?type=keycode&keycode={code}"
+function sendKeyCode(keycode) {
+    $.get(keycodeUrl.format({ code: code }), function (data, status) {
+    });
+}
+
+var charUrl = controlBaseUrl + "sendevent?type=keychar&keychar={char}"
+function sendKeyChar(char) {
+    $.get(charUrl.format({ char: char }), function (data, status) {
+    });
+}
+
+function toast(mess) {
+    var str = '<div class="mess"><span></span></div>';
+    $("body").append(str);
+    $(".mess").find("span").text(mess);
+    setTimeout(function () {
+        $(".mess").remove();
+    }, 2000)
 }

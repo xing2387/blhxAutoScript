@@ -1,7 +1,7 @@
 .function-btn{
 	background: #666;
 }
-.gray1 { 
+.gray { 
     -webkit-filter: grayscale(100%);
     -moz-filter: grayscale(100%);
     -ms-filter: grayscale(100%);

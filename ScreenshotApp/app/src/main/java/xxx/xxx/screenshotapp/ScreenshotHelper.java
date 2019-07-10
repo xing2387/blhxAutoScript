@@ -42,7 +42,11 @@ public class ScreenshotHelper extends BaseHelper {
 
     public int getRotation() {
         try {
-            return getWindowsManager().getRotation();
+            if (Build.VERSION.SDK_INT <= 25) {
+                return getWindowsManager().getRotation();
+            } else {
+                return getWindowsManager().getDefaultDisplayRotation();
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -87,8 +91,10 @@ public class ScreenshotHelper extends BaseHelper {
             mScale = mSize <= 0 ? 1 : mSize * 1f / Math.min(mScreenSize.x, mScreenSize.y);
         }
 
+        int width = (int) (mScreenSize.x * mScale);
+        int height = (int) (mScreenSize.y * mScale);
         Bitmap b = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot",
-                Integer.TYPE, Integer.TYPE).invoke(null, (int) (mScreenSize.x * mScale), (int) (mScreenSize.y * mScale));
+                Integer.TYPE, Integer.TYPE).invoke(null, width, height);
         if (b == null) {
             throw new NullPointerException("screenshot method return null !!");
         }
@@ -105,7 +111,9 @@ public class ScreenshotHelper extends BaseHelper {
         } else if (rotation == 3) {
             m.postRotate(-270.0f);
         }
-        return Bitmap.createBitmap(b, 0, 0, mScreenSize.x, mScreenSize.y, m, false);
+        Bitmap result = Bitmap.createBitmap(b, 0, 0, width, height, m, false);
+        b.recycle();
+        return result;
     }
 
 }

@@ -31,8 +31,8 @@ String.prototype.format = function (args) {
     return result;
 }
 
-// var host = "127.0.0.1";
-var host = "192.168.2.1";
+var host = "127.0.0.1";
+//var host = "192.168.2.1";
 var screenshotPort = 50087;
 var controlPort = 50088;
 var screenshotBaseUrl = "http://" + host + ":" + screenshotPort + "/";
@@ -99,14 +99,14 @@ $(function () {
         imgW = $("#phone").width();
         imgT = $("#phone").offset().top;
         imgL = $("#phone").offset().left;
-        // $(".span2").html("<br>" + $("#phone").offset().left + "," + $("#phone").offset().top);
-        //    var ii = 80 - (new Date().getTime()) + lastShotTime;
-        //    if (ii > 0) {
-        // $(".span2").html("<br> " + ii);
-        //        setTimeout("showImg()", ii);
-        //    } else {
-        showImg();
-        //    }
+        $(".span2").html("<br>" + $("#phone").offset().left + "," + $("#phone").offset().top);
+        var ii = 100 - (new Date().getTime()) + lastShotTime;
+        if (ii > 0) {
+            $(".span2").html("<br> " + ii);
+            setTimeout("showImg()", ii);
+        } else {
+            showImg();
+        }
     });
     // $("#phone").bind("click", function (e) {
     //     // var sPosPage = "(" + e.pageX + "," + e.pageY + ")";
@@ -171,10 +171,16 @@ $(function () {
             } else if (keycode == 192) { //`
                 $.get(controlBaseUrl + "sendevent?type=back", function (data, status) {
                 });
+            } else if (keycode == 13) { //enter
+                sendKeyCode(66);
+            } else if (keycode == 32) { //space
+                sendKeyCode(62);
+            } else if (keycode <= 40 && keycode >= 37) { //space
+                // sendKeyCode(62);
             } else if (keycode == 16 || keycode == 18) {
 
             } else if (event.originalEvent.key.length == 1) {
-                sendKeyChar(event);
+                sendKeyChar(event.originalEvent.key);
             }
             console.log(event);
         });
@@ -213,7 +219,7 @@ function aadragend(e) {
 
 var keycodeUrl = controlBaseUrl + "sendevent?type=keycode&keycode={code}"
 function sendKeyCode(keycode) {
-    $.get(keycodeUrl.format({ code: code }), function (data, status) {
+    $.get(keycodeUrl.format({ code: keycode }), function (data, status) {
     });
 }
 

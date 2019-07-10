@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
  * Created by n7642 on 2018/2/27.
  */
 
+@SuppressWarnings("ALL")
 public class BaseHelper {
 
 

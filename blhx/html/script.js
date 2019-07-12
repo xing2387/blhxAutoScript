@@ -54,7 +54,7 @@ var picSize = 540;
 var c = 0;
 
 function showImg() {
-    $("#phone").attr("src", screenshotBaseUrl + "screenshot?format=jpg&size=540&quality=30&c=" + c++);//&size=1080
+    $("#phone").attr("src", screenshotBaseUrl + "screenshot?format=jpg&size=540&quality=70&c=" + c++);//&size=1080
     lastShotTime = new Date().getTime();
 }
 

@@ -106,7 +106,7 @@ def screenshotStop2(device=None):
 def downloadScreenshot(outputFilename, device=None):
     print("downloadScreenshot ")
     if checkProcessExist(device):
-        req = requests.get('http://192.168.2.1:50087/screenshot?format="jpg"')
+        req = requests.get('http://127.0.0.1:50087/screenshot?format="jpg"')
         with open(outputFilename, "wb") as outFile:
             outFile.write(req.content)
 

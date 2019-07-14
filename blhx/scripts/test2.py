@@ -14,6 +14,9 @@ def showimg(img):
     cv.waitKey(0)
     cv.destroyAllWindows()
 
+
+
+##### 透视变换
 filename = "/tmp/sdafwer.jpg"
 getpic.downloadScreenshot(filename)
 img = cv.imread(filename, 1)
@@ -30,3 +33,4 @@ M = cv.getPerspectiveTransform(m1, m2)
 dst = cv.warpPerspective(img, M, (imgW, imgH), cv.INTER_LINEAR)
 
 showimg(dst)
+##################

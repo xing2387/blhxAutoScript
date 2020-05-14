@@ -44,6 +44,13 @@ public class MainControl {
         System.out.println("Andcast MainControl Entry!");
 
         AsyncServer server = new AsyncServer();
+        httpServer.get("/stop", new HttpServerRequestCallback() {
+            @Override
+            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+                response.send("MainControl bye");
+                System.exit(0);
+            }
+        });
         httpServer.get("/sendevent", new HttpServerRequestCallback() {
             @Override
             public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {

@@ -3,9 +3,6 @@ package android.hardware.input;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by n7642 on 2018/2/22.
- */
 
 public class InputDeviceIdentifier implements Parcelable {
 

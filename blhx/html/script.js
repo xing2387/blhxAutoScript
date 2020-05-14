@@ -32,7 +32,7 @@ String.prototype.format = function (args) {
 }
 
 var host = "127.0.0.1";
-//var host = "192.168.2.1";
+// var host = "192.168.31.139";
 var screenshotPort = 50087;
 var controlPort = 50088;
 var screenshotBaseUrl = "http://" + host + ":" + screenshotPort + "/";
@@ -100,13 +100,13 @@ $(function () {
         imgT = $("#phone").offset().top;
         imgL = $("#phone").offset().left;
         $(".span2").html("<br>" + $("#phone").offset().left + "," + $("#phone").offset().top);
-        var ii = 100 - (new Date().getTime()) + lastShotTime;
-        if (ii > 0) {
-            $(".span2").html("<br> " + ii);
-            setTimeout("showImg()", ii);
-        } else {
-            showImg();
-        }
+        // var ii = 100 - (new Date().getTime()) + lastShotTime;
+        // if (ii > 0) {
+        //     $(".span2").html("<br> " + ii);
+        //     setTimeout("showImg()", ii);
+        // } else {
+        //     showImg();
+        // }
     });
     // $("#phone").bind("click", function (e) {
     //     // var sPosPage = "(" + e.pageX + "," + e.pageY + ")";

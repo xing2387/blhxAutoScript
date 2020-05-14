@@ -5,6 +5,9 @@ import android.hardware.display.IDisplayManager;
 import android.hardware.input.InputManager;
 import android.os.IBinder;
 import android.view.IWindowManager;
+import android.view.inputmethod.InputMethodManager;
+
+import com.android.internal.view.IInputMethodManager;
 
 import java.lang.reflect.Method;
 
@@ -15,11 +18,11 @@ import java.lang.reflect.Method;
 @SuppressWarnings("ALL")
 public class BaseHelper {
 
-
     private static Method sServiceManager;
     private static IDisplayManager sDisplayManager;
     private static IWindowManager sWindowsManager;
     private static InputManager sInputManager;
+    private static InputMethodManager sInputMethodManager;
 
     public BaseHelper() {
     }
@@ -71,5 +74,17 @@ public class BaseHelper {
             }
         }
         return sInputManager;
+    }
+
+    @SuppressLint("PrivateApi")
+    public static InputMethodManager getInputMethodManager() {
+        if (sInputMethodManager == null) {
+            try {
+                sInputMethodManager = (InputMethodManager) InputMethodManager.class.getDeclaredMethod("getInstance", new Class[0]).invoke(null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return sInputMethodManager;
     }
 }

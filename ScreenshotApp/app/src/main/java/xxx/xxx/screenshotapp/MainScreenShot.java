@@ -73,6 +73,13 @@ public class MainScreenShot {
         System.out.println("Andcast MainScreenShot Entry!");
 
         AsyncServer server = new AsyncServer();
+        httpServer.get("/stop", new HttpServerRequestCallback() {
+            @Override
+            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+                response.send("MainScreenShot bye");
+                System.exit(0);
+            }
+        });
         httpServer.get("/screenshot", new ScreenshotRequestCallback());
         httpServer.get("/size", new ScreenSizeRequestCallback());
         httpServer.get("/sendevent", new HttpServerRequestCallback() {

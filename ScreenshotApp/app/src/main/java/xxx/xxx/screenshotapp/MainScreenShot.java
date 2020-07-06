@@ -84,14 +84,13 @@ public class MainScreenShot {
         httpServer.get("/size", new ScreenSizeRequestCallback());
         httpServer.get("/sendevent", new HttpServerRequestCallback() {
             @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+            public void onRequest(AsyncHttpServerRequest request,
+                                  AsyncHttpServerResponse response) {
                 response.getHeaders().set("Access-Control-Allow-Origin", "*");
-                String requestStr = reqParamToJson(request).toString();//request.getQuery().toString();
+                String requestStr = reqParamToJson(request).toString();
                 response.send(requestStr);
 
-//                System.out.println("/sendevent, " + requestStr);
                 InputHelper.getInputEventCallback().onStringAvailable(requestStr);
-
             }
         });
         httpServer.listen(PORT);
@@ -169,7 +168,6 @@ public class MainScreenShot {
                 Bitmap bitmap = sScreenshotHelper.screenshot();
 //                System.out.println("sScreenshotHelper.screenshot() " + (System.currentTimeMillis() - t));
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
 
                 bitmap.compress(compressFormat, quality, bout);
                 bout.flush();

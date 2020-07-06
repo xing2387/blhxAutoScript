@@ -68,7 +68,8 @@ public class BaseHelper {
     public static InputManager getInputManager() {
         if (sInputManager == null) {
             try {
-                sInputManager = (InputManager) InputManager.class.getDeclaredMethod("getInstance", new Class[0]).invoke(null);
+                sInputManager = (InputManager) InputManager.class
+                        .getDeclaredMethod("getInstance", new Class[0]).invoke(null);
             } catch (Exception e) {
                 e.printStackTrace();
             }

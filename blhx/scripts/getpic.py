@@ -71,9 +71,10 @@ def rootScreenshotStart(device=None):
 
 def checkProcessExist(device=None):
     adb = getAdbCommend(device)
-    result = os.system(adb + ' shell "netstat -tnl | grep 5008"')
-    Started.setStarted(result == 0)
-    print("checkProcessExist: " + str(result == 0))
+    result = os.popen(adb + ' shell "netstat -tnl | grep 5008"')
+    started = "5008" in result.read()
+    Started.setStarted(started)
+    print("checkProcessExist: " + str(started))
     return Started.isStarted()
 
 

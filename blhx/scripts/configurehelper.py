@@ -63,8 +63,8 @@ class Configure():
             cls.__chapters = {}
             chapters = cls.getConf()["chapters"]
             for chapter in chapters:
-                cls.__chapters[chapter["name"]
-                               ] = Chapter.parseFromDict(chapter)
+                print(str(chapter))
+                cls.__chapters[chapter["name"]] = Chapter.parseFromDict(chapter)
         return cls.__chapters
 
     @classmethod
@@ -134,10 +134,9 @@ class Chapter():
         subchapters = {}
         for label in chapter["templates"]["slabel"]:
             labels.append(Template.parseFromDict(label))
-        if not chapter["subchapters"]:
+        if chapter["subchapters"]:
             for subchapter in chapter["subchapters"]:
-                subchapters[subchapter["name"]
-                            ] = Subchapter.parseFromDict(subchapter)
+                subchapters[subchapter["name"]] = Subchapter.parseFromDict(subchapter)
         name = chapter["name"]
         pageIndex = chapter["pageIndex"]
         return Chapter(name, pageIndex, labels, subchapters)
@@ -169,7 +168,9 @@ class Template():
         return Template(dataDict["path"], dataDict["rect"], dataDict["name"], dataDict["threshold"])
 
     def __init__(self, path, rect, name, threshold):
-        self.rect = Rect(rect[0], rect[1], rect[2], rect[3])
+        self.rect = None
+        if rect:
+            self.rect = Rect(rect[0], rect[1], rect[2], rect[3])
         self.path = getPath(path)
         self.name = name
         self.threshold = threshold
@@ -187,7 +188,8 @@ class Rect():
 
 
 if __name__ == "__main__":
-    print(Configure.getScenes())
-    print(Configure.getScenes()[0].templates[0].path)
+    # print(Configure.getScenes())
+    # print(Configure.getScenes()[0].templates[0].path)
     print(Configure.getEnemyIcons('s3', 'e4'))
+    # print(Configure.getChapter('s3').subchapters)
     # print(getScene().name)

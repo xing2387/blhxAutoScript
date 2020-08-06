@@ -62,7 +62,7 @@ def matchSingleTemplate(sourceImg, templateImg, threshold, mask=None, mark=False
         mark:   whether draw ractangle in the sourceImg
     """
     h, w = templateImg.shape[:2]
-    res = cv.matchTemplate(sourceImg, templateImg, cv.TM_CCOEFF_NORMED)
+    res = cv.matchTemplate(sourceImg, templateImg, cv.TM_CCOEFF_NORMED, mask = mask)
 
     loc = np.where(res >= threshold)
     foundPoints = filterPoints(zip(*loc[::-1]), w, h)
@@ -80,12 +80,10 @@ def matchSingleTemplate(sourceImg, templateImg, threshold, mask=None, mark=False
     return result
 
 
-def matchMutiTemplateInRect(sourceImg, templateImgs, threshold, rect, outFilename=None, mask=None, mark=False):
-    sourceImg = sourceImg[rect.y:rect.y +
-                          rect.height, rect.x:rect.x + rect.width]
+def matchMutiTemplateInRect(sourceImg, templateImgs, threshold, rect, outFilename=None, masks=None, mark=False):
+    sourceImg = sourceImg[rect.y:rect.y + rect.height, rect.x:rect.x + rect.width]
     # showimg(sourceImg)
-    result = matchMutiTemplate(
-        sourceImg, templateImgs, threshold, outFilename, mask, mark)
+    result = matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename, masks, mark)
     if len(result) > 0:
         for aa in result:
             aa[0] += rect.x
@@ -93,7 +91,7 @@ def matchMutiTemplateInRect(sourceImg, templateImgs, threshold, rect, outFilenam
     return result
 
 
-def matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename=None, mask=None, mark=False):
+def matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename=None, masks=None, mark=False):
     # threads = []
     h, w = templateImgs[0].shape[:2]
     for templateImg in templateImgs:
@@ -104,9 +102,14 @@ def matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename=None, mask
             w = w0
     pointsList = []
     with Pool(5) as p:
-        func = functools.partial(
-            matchSingleTemplate, sourceImg, threshold=threshold, mask=mask, mark=mark)
-        pointsList = p.map(func, templateImgs)
+        # func = functools.partial(matchSingleTemplate, sourceImg, threshold=threshold, mark=mark)
+# def matchSingleTemplate(sourceImg, templateImg, threshold, mask=None, mark=False):
+        for i in range(0, len(templateImgs)):
+            print("--------- " + str(i))
+            mask = None
+            if masks:
+                mask =  masks[i]
+            pointsList.append(p.apply(matchSingleTemplate, kwds={'sourceImg': sourceImg, 'templateImg': templateImgs[i], 'threshold': threshold}))
     points = []
     for pts in pointsList:
         for pt in pts:
@@ -120,7 +123,7 @@ def matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename=None, mask
 
 
 if __name__ == "__main__":
-    base_dir = "test/"
+    base_dir = "./"
     # dir_out = base_dir + "out/"
     # dir_src = base_dir + "src/"
     # files_source = []
@@ -159,5 +162,7 @@ if __name__ == "__main__":
     # M = cv.getPerspectiveTransform(m1, m2)
     # dst = cv.warpPerspective(img, M, (imgW, imgH), cv.INTER_LINEAR)
     # showimg(dst)
-    template = cv.imread(base_dir+"/template1.jpg")
-    result = matchSingleTemplate(img, template, 0.6, None, True)
+    template = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/enemy_icons/t2.png")
+    mask = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/enemy_icons/mask2.png")
+    result = matchSingleTemplate(img, template, 0.8, None, True)
+    # print(result)

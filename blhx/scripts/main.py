@@ -48,10 +48,10 @@ def findChapter(subchapterName):
     imgLeftBtn = cv.imread(btnLeft.path)
     imgRightBtn = cv.imread(btnright.path)
     sourceImg = getScreenshot()
-    hasLeft, loc = matchTemplate.hasItemInRect(
-        sourceImg, imgLeftBtn, btnLeft.threshold, btnLeft.rect)
-    hasRight, loc = matchTemplate.hasItemInRect(
-        sourceImg, imgRightBtn, btnright.threshold, btnright.rect)
+    hasLeft, loc = matchTemplate.hasItem(
+        sourceImg, imgLeftBtn, btnLeft.threshold)
+    hasRight, loc = matchTemplate.hasItem(
+        sourceImg, imgRightBtn, btnright.threshold)
 
     funClickLeft = fpartial(click, x=60, y=500, w=50, h=80, deltaT=50)
     funClickRight = fpartial(click, x=1810, y=500, w=50 + 15, h=80, deltaT=50)
@@ -89,10 +89,10 @@ def findChapter(subchapterName):
             i = min(count, i + 1)
     count = extraRight
     sourceImg = getScreenshot()
-    hasLeft, loc = matchTemplate.hasItemInRect(
-        sourceImg, imgLeftBtn, btnLeft.threshold, btnLeft.rect)
-    hasRight, loc = matchTemplate.hasItemInRect(
-        sourceImg, imgRightBtn, btnright.threshold, btnright.rect)
+    hasLeft, loc = matchTemplate.hasItem(
+        sourceImg, imgLeftBtn, btnLeft.threshold)
+    hasRight, loc = matchTemplate.hasItem(
+        sourceImg, imgRightBtn, btnright.threshold)
     if not hasRight:
         print("btn lastChapter not found")
         count = 10 - page
@@ -116,12 +116,11 @@ def precombat(locations, sourceImg, subchapterName):
         for x in range(attemptTimes):
             print("find subchapter label " +
                   template.path + ", attempt " + str(attempt))
-            result, location = matchTemplate.hasItemInRect(
-                sourceImg, templateImg, template.threshold, template.rect)
+            result, location = matchTemplate.hasItem(
+                sourceImg, templateImg, template.threshold)
             if result:
                 location = location[0]
-                click(location[0], location[1],
-                      template.rect.width/2, template.rect.height/2, 70)
+                click(location[0], location[1], templateImg.shape[1]/2, templateImg.shape[0]/2, 70)
                 time.sleep(2)
                 break
             sourceImg = getScreenshot()
@@ -151,11 +150,10 @@ def shortEnemyPositionList(points, shortOrder):
     pass
 
 
-def findEnemies(sourceImg, enemyIconsImg):
+def findEnemies(sourceImg, enemyIconsImg, enemyIconsMask):
     # print(sourceImg.shape)
-    rect = Rect(180, 0, sourceImg.shape[1] - 180, sourceImg.shape[0])
-    locs = matchTemplate.matchMutiTemplateInRect(
-        sourceImg, enemyIconsImg, 0.5, rect)
+    rect = Rect(0, 0, sourceImg.shape[1], sourceImg.shape[0])
+    locs = matchTemplate.matchMutiTemplateInRect(sourceImg, enemyIconsImg, 0.8, rect, masks=enemyIconsMask)
     shortEnemyPositionList(locs, 1)
     return locs
 
@@ -169,16 +167,21 @@ def subchapter(locations, sourceImg, subchapterName):
     subchapter = Configure.getSubchapter(s, e)
     count = subchapter.fight
     enemyIconsImg = []
-    for enemyIcon in subchapter.enemyIcons:
+    enemyIconsMask = []
+    iconCount = len(subchapter.enemyIcons)
+    for enemyIcon in subchapter.enemyIcons[0:int(iconCount/2)]:
         enemyIconsImg.append(cv.imread(enemyIcon))
+        print("=========== " + str(int(iconCount/2)) +", "+str(enemyIcon))
+    for enemyIcon in subchapter.enemyIcons[int(iconCount/2):]:
+        enemyIconsMask.append(cv.imread(enemyIcon))
     while count > 0:
         sourceImg = getScreenshot()
-        locs = findEnemies(sourceImg, enemyIconsImg)
+        locs = findEnemies(sourceImg, enemyIconsImg, enemyIconsMask)
         if len(locs) <= 0:
             # drag
             pass
         if subchapter.bossDirect in [3, 4, 5]:
-            clickToFight(locs[len(locs) - 1])
+            clickToFight([locs[-1][0], locs[-1][1]])
             time.sleep(7)
             return 3
             # scence, locations = scencehelper.witchScence(getScreenshot(), 4)
@@ -199,12 +202,12 @@ def formation(locations, sourceImg, subchapterName):
 def fighting(locations, sourceImg, subchapterName):
     btnAutoFight = Configure.getButton("autofight")
     btnAutoFightImg = cv.imread(btnAutoFight.path)
-    found, loc = matchTemplate.hasItemInRect(
-        sourceImg, btnAutoFightImg, btnAutoFight.threshold, btnAutoFight.rect)
+    found, loc = matchTemplate.hasItem(
+        sourceImg, btnAutoFightImg, btnAutoFight.threshold)
     if found:
         sourceImg = getScreenshot()
-        found, loc = matchTemplate.hasItemInRect(
-            sourceImg, btnAutoFightImg, btnAutoFight.threshold, btnAutoFight.rect)
+        found, loc = matchTemplate.hasItem(
+            sourceImg, btnAutoFightImg, btnAutoFight.threshold)
     if found:
         click(70, 50, 270, 60, 80)
         time.sleep(3)

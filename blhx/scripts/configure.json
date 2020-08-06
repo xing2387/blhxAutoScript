@@ -1,7 +1,6 @@
 {
     "base_dir": {
         "st":   "res/scenes/templates/",
-        "eilb": "res/enemy_icons/light_blue/",
         "ei": "res/enemy_icons/",
         "scl":  "res/subchapter/labels/",
         "p":    "res/precombat/",
@@ -167,10 +166,12 @@
                         ]
                     },
                     "enemy_icons": [
-                        "eilb#s.png",
-                        "eilb#m.png",
-                        "eilb#l.png",
-                        "eilb#boss.png"
+                        "ei#t1.png",
+                        "ei#t2.png",
+                        "ei#t3.png",
+                        "ei#mask1.png",
+                        "ei#mask2.png",
+                        "ei#mask3.png"
                     ]
                 }
             ]

@@ -26,11 +26,11 @@ def witchScence(sourceImg, preferStartIndex=0):
         points = []
         found = len(scence.templates) > 0
         for template in scence.templates:
+            print(template.path)
             templateImg = cv.imread(template.path)
             # showimg(sourceImg)
             # showimg(templateImg)
-            found, result = matchTemplate.hasItem(
-                sourceImg, templateImg, template.threshold)
+            found, result = matchTemplate.hasItem(sourceImg, templateImg, template.threshold)
             if found:
                 points.append(result)
             else:

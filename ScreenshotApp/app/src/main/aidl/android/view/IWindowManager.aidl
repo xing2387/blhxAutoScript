@@ -442,4 +442,12 @@ interface IWindowManager
      * Remove the input consumer for wallpaper events.
      */
     void removeWallpaperInputConsumer();
+
+    /**
+     * Retrieve the current orientation of the primary screen.
+     * @return Constant as per {@link android.view.Surface.Rotation}.
+     *
+     * @see android.view.Display#DEFAULT_DISPLAY
+     */
+    int getDefaultDisplayRotation();
 }

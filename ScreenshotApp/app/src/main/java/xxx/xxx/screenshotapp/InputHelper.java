@@ -1,7 +1,12 @@
 package xxx.xxx.screenshotapp;
 
 import android.annotation.SuppressLint;
+import android.graphics.Path;
+import android.graphics.PathMeasure;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.hardware.input.InputManager;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.util.Log;
@@ -10,7 +15,11 @@ import android.view.InputEvent;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.RelativeLayout;
 
+import com.android.internal.view.IInputMethodManager;
 import com.koushikdutta.async.http.WebSocket;
 
 import org.json.JSONArray;
@@ -46,6 +55,8 @@ public class InputHelper extends BaseHelper {
         put("menu", KeyEvent.KEYCODE_MENU);
         put("recent", KeyEvent.KEYCODE_APP_SWITCH);
     }};
+
+    private static KeyCharacterMap mKeyCharacterMap;
 
 
     private static void injectMotionEvent(InputManager inputManager, Method injectInputEventMethod,
@@ -100,8 +111,13 @@ public class InputHelper extends BaseHelper {
         long time = SystemClock.uptimeMillis();
         int metaShiftOn = shift ? KeyEvent.META_SHIFT_ON : 0;
         try {
-            injectKeyEvent(inputManager, injectInputEventMethod,
-                    new KeyEvent(time, time, MotionEvent.ACTION_DOWN, code, 0, metaShiftOn, -1, 0, 0, source));
+
+            KeyEvent keyEvent = new KeyEvent(time, time, MotionEvent.ACTION_DOWN, code,
+                    0, metaShiftOn, -1, 0, 0, source);
+            injectInputEventMethod.invoke(inputManager, keyEvent, 0);
+
+            injectKeyEvent(inputManager, injectInputEventMethod, keyEvent);
+
             injectKeyEvent(inputManager, injectInputEventMethod,
                     new KeyEvent(time, time, MotionEvent.ACTION_UP, code, 0, metaShiftOn, -1, 0, 0, source));
         } catch (Exception e) {
@@ -125,7 +141,11 @@ public class InputHelper extends BaseHelper {
             synchronized (InputHelper.class) {
                 if (sInputEventCallback == null) {
                     try {
-                        Method method = InputManager.class.getDeclaredMethod("injectInputEvent", InputEvent.class, Integer.TYPE);
+                        @SuppressLint("DiscouragedPrivateApi")
+
+                        Method method = InputManager.class.getDeclaredMethod(
+                                "injectInputEvent", InputEvent.class, Integer.TYPE);
+
                         sInputEventCallback = createWebSocketHandler(method, getInputManager(), KeyCharacterMap.load(-1));
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -163,12 +183,16 @@ public class InputHelper extends BaseHelper {
                     Log.e("screenshotapp", "input websocket", e);
                     return;
                 }
+                if ("stop".equals(eventType)) {
+                    System.exit(0);
+                }
 
                 if (doMouseAction(eventType, clientX, clientY, paramJson) ||
                         doKeyAction(eventType, paramJson) ||
                         doConfigureAction(eventType, paramJson) ||
                         doScreenRecord(eventType) ||
-                        doShowToast(eventType, paramJson)) {
+                        doShowToast(eventType, paramJson) ||
+                        doTextInput(eventType, paramJson)) {
                     return;
                 }
 
@@ -206,6 +230,38 @@ public class InputHelper extends BaseHelper {
                     return;
                 }
                 Log.e("screenshotapp", "Unknown: " + paramJson);
+            }
+
+            public boolean doTextInput(String eventType, JSONObject paramJson) {
+                if (paramJson != null && "text".equals(eventType)) {
+                    if (mKeyCharacterMap == null) {
+                        mKeyCharacterMap = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
+                    }
+                    String content = paramJson.optString("text");
+                    char[] chars = new char[content.length()];
+                    content.getChars(0, content.length(), chars, 0);
+                    KeyEvent[] events = mKeyCharacterMap.getEvents(chars);
+                    try {
+                        for (KeyEvent event : events) {
+                            injectInputEventMethod.invoke(inputManager, event, 0);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+//                    KeyEvent event = new KeyEvent(SystemClock.uptimeMillis(),
+//                            content, KeyCharacterMap.VIRTUAL_KEYBOARD, 0);
+//                    try {
+//                        if (Looper.getMainLooper() == null) {
+//                            Looper.prepareMainLooper();
+//                        }
+//                        Method method = InputMethodManager.class.getDeclaredMethod("dispatchKeyEventFromInputMethod", View.class, KeyEvent.class);
+//                        method.invoke(getInputMethodManager(), null, event);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+                    return true;
+                }
+                return false;
             }
 
             public boolean doShowToast(String eventType, JSONObject paramJson) {
@@ -264,6 +320,56 @@ public class InputHelper extends BaseHelper {
                         }
                         break;
                     case "drag":
+                        if (!this.isDown) {
+                            try {
+                                JSONArray jsonArray = new JSONArray(paramJson.optString("path"));
+                                Point startP = new Point(jsonArray.getInt(0), jsonArray.getInt(1));
+                                Point endP = new Point(jsonArray.getInt(2), jsonArray.getInt(3));
+
+
+                                this.downTime = SystemClock.uptimeMillis();
+                                int timeStep = (int) (22 + 6 * Math.random());
+                                long eventTime = downTime + timeStep;
+                                //注入一个down事件
+                                injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
+                                        MotionEvent.ACTION_DOWN, this.downTime, eventTime, startP.x, startP.y, 1.0F);
+                                //构造一个贝塞尔曲线的控制点
+                                PointF controlP = new PointF((3f * startP.x + endP.x) / 4, (startP.y + 3f * endP.y) / 4);
+                                Path path = new Path();
+                                //Path生成贝塞尔曲线
+                                path.quadTo(controlP.x - startP.x, controlP.y - startP.y,
+                                        endP.x - startP.x, endP.y - startP.y);
+                                PathMeasure pathMeasure = new PathMeasure(path, false);
+                                float length = pathMeasure.getLength();
+                                int stepLen = 50;
+                                float[] motionP = new float[]{0, 0};
+                                //测量计算线上点的坐标，不断注入MOVE事件
+                                for (int dist = 0; dist < length; dist += stepLen) {
+                                    timeStep = (int) (20 + 6 * Math.random());
+                                    eventTime += timeStep;
+                                    pathMeasure.getPosTan(dist, motionP, null);
+                                    float motionX = startP.x + motionP[0];
+                                    float motionY = startP.y + motionP[1];
+                                    try {
+                                        Thread.sleep(timeStep - 5);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
+                                            MotionEvent.ACTION_MOVE, this.downTime, eventTime, motionX, motionY, 1.0F);
+                                }
+                                timeStep = (int) (22 + 6 * Math.random());
+                                eventTime += timeStep;
+                                //最后注入一个UP事件
+                                injectMotionEvent(inputManager, injectInputEventMethod, InputDevice.SOURCE_TOUCHSCREEN,
+                                        MotionEvent.ACTION_UP, this.downTime, eventTime, endP.x, endP.y, 1.0F);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                    case "drag1":
                         if (!this.isDown) {
                             this.downTime = SystemClock.uptimeMillis();
                             try {

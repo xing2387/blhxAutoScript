@@ -21,6 +21,11 @@ import android.os.Parcelable;
 
 public class Surface implements Parcelable {
 
+    public static final int ROTATION_0 = 0;
+    public static final int ROTATION_180 = 2;
+    public static final int ROTATION_270 = 3;
+    public static final int ROTATION_90 = 1;
+
     public static final Creator<Surface> CREATOR = new Creator<Surface>() {
         @Override
         public Surface createFromParcel(Parcel in) {

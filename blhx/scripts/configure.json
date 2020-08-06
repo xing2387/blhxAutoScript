@@ -1,0 +1,212 @@
+{
+    "base_dir": {
+        "st":   "res/scenes/templates/",
+        "ei": "res/enemy_icons/",
+        "scl":  "res/subchapter/labels/",
+        "p":    "res/precombat/",
+        "b":    "res/buttons/"
+    },
+    "scenes": [
+        {
+            "name": "home",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "strike",
+                    "path": "st#home.png",
+                    "rect": [1500, 540, 250, 70]
+                }
+            ]
+        },
+        {
+            "name": "precombat",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "archor",
+                    "path": "st#precombat.png",
+                    "rect": [170, 10, 130, 60]
+                },
+                {
+                    "threshold": 0.85,
+                    "name": "delegation",
+                    "path": "st#delegation.png",
+                    "rect": [1400, 970, 200, 90]
+                }
+            ]
+        },
+        {
+            "name": "gofight",
+            "templates": [
+                {
+                    "name" : "gofight",
+                    "threshold": 0.9,
+                    "path": "p#gofight.png",
+                    "rect": [1280, 680, 240, 80]
+                }
+            ]
+        },
+        {
+            "name": "avoid",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "avoid",
+                    "path": "b#avoid.png",
+                    "rect": [1190, 500, 330, 110]
+                }
+            ]
+        },
+        {
+            "name": "subchapter",
+            "templates": [
+                {
+                    "threshold": 0.8,
+                    "name": "subchapter",
+                    "path": "st#subchapter.png",
+                    "rect": [1600, 970, 230, 80]
+                }
+            ]
+        },
+        {
+            "name": "formation",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "shot",
+                    "path": "b#shot.png",
+                    "rect": [1400, 880, 350, 150]
+                }
+            ]
+        },
+        {
+            "name": "fighting",
+            "templates": [
+                {
+                    "threshold": 0.95,
+                    "name": "pause",
+                    "path": "b#pause.png",
+                    "rect": [1800, 25, 90, 90]
+                }
+            ]
+        },
+        {
+            "name": "victory",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "victory",
+                    "path": "st#victory.png",
+                    "rect": [330, 680, 350, 90]
+                }
+            ]
+        },
+        {
+            "name": "getitem",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "getitem",
+                    "path": "st#getitem.png",
+                    "rect": [740, 196, 450, 110]
+                }
+            ]
+        },
+        {
+            "name": "getship",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "getship",
+                    "path": "st#getship.png",
+                    "rect": [1470, 830, 110, 110]
+                }
+            ]
+        },
+        {
+            "name": "battleend",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "battleend_1550_880",
+                    "path": "st#battleend.png",
+                    "rect": [1260, 870, 210, 100]
+                }
+            ]
+        }
+    ],
+    "precombat": {},
+    "chapters": [
+        {
+            "name" : "s3",
+            "pageIndex": 3,
+            "templates": {
+                "slabel": [
+                    {
+                        "name" : "slabel",
+                        "threshold": 0.7,
+                        "path": "scl#s3.png",
+                        "rect": [10, 130, 150, 50]
+                    }
+                ]
+            },
+            "subchapters": [
+                {
+                    "name" : "e4",
+                    "boss_direct": 5,
+                    "fight": 3,
+                    "templates": {
+                        "elabel": [
+                            {
+                                "name" : "elabel",
+                                "threshold": 0.5,
+                                "path": "scl#s3e4.png",
+                                "rect": [950, 515, 160, 50]
+                            }
+                        ]
+                    },
+                    "enemy_icons": [
+                        "ei#t1.png",
+                        "ei#t2.png",
+                        "ei#t3.png",
+                        "ei#mask1.png",
+                        "ei#mask2.png",
+                        "ei#mask3.png"
+                    ]
+                }
+            ]
+        }
+    ],
+    "buttons": [
+        {
+            "name": "lastchapter",
+            "threshold": 0.85,
+            "path": "b#lastchapter.png",
+            "rect": [90, 480, 40, 120]
+        },
+        {
+            "name": "nextchapter",
+            "threshold": 0.85,
+            "path": "b#nextchapter.png",
+            "rect": [1800, 490, 40, 120]
+        },
+        {
+            "name": "shot",
+            "threshold": 0.9,
+            "path": "b#shot.png",
+            "rect": [1400, 880, 350, 150]
+        },
+        {
+            "threshold": 0.9,
+            "name": "autofight",
+            "path": "b#autofight.png",
+            "rect": [120, 30, 90, 90]
+        },
+        {
+            "threshold": 0.9,
+            "name": "avoid",
+            "path": "b#avoid.png",
+            "rect": [1190, 500, 330, 110]
+        }
+    ]
+}

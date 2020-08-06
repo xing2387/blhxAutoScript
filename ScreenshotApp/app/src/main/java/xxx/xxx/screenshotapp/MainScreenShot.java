@@ -3,11 +3,10 @@ package xxx.xxx.screenshotapp;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Looper;
-import android.util.JsonReader;
+import android.util.Log;
 
 import com.koushikdutta.async.AsyncServer;
 import com.koushikdutta.async.http.NameValuePair;
-import com.koushikdutta.async.http.WebSocket;
 import com.koushikdutta.async.http.server.AsyncHttpServer;
 import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
 import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
@@ -18,7 +17,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 
 /**
@@ -41,6 +39,7 @@ import java.util.Locale;
  * adb shell "x=/sdcard/Android/data/xxx.xxx.screenshotapp; export CLASSPATH=$x/classes.dex; exec app_process $x xxx.xxx.screenshotapp.MainScreenShot '$@'"
  */
 public class MainScreenShot {
+    private static final String TAG = "MainScreenShot";
 
     private static final int PORT = 50087;
 
@@ -74,21 +73,27 @@ public class MainScreenShot {
         System.out.println("Andcast MainScreenShot Entry!");
 
         AsyncServer server = new AsyncServer();
+        httpServer.get("/stop", new HttpServerRequestCallback() {
+            @Override
+            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+                response.send("MainScreenShot bye");
+                System.exit(0);
+            }
+        });
         httpServer.get("/screenshot", new ScreenshotRequestCallback());
         httpServer.get("/size", new ScreenSizeRequestCallback());
         httpServer.get("/sendevent", new HttpServerRequestCallback() {
             @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+            public void onRequest(AsyncHttpServerRequest request,
+                                  AsyncHttpServerResponse response) {
                 response.getHeaders().set("Access-Control-Allow-Origin", "*");
-                String requestStr = reqParamToJson(request).toString();//request.getQuery().toString();
+                String requestStr = reqParamToJson(request).toString();
                 response.send(requestStr);
 
-//                System.out.println("/sendevent, " + requestStr);
                 InputHelper.getInputEventCallback().onStringAvailable(requestStr);
-
             }
         });
-        httpServer.listen(server, PORT);
+        httpServer.listen(PORT);
 
         Looper.loop();
     }
@@ -164,15 +169,16 @@ public class MainScreenShot {
 //                System.out.println("sScreenshotHelper.screenshot() " + (System.currentTimeMillis() - t));
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
-
                 bitmap.compress(compressFormat, quality, bout);
                 bout.flush();
                 response.send("image/" + format, bout.toByteArray());
+                bitmap.recycle();
 //                System.out.println("Screenshot " + (System.currentTimeMillis() - t));
 
             } catch (Exception e) {
                 response.code(500);
                 response.send(e.toString());
+                Log.e(TAG, "onRequest: ", e);
             }
         }
     }

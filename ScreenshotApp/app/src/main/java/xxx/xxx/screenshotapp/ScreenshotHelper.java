@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.RemoteException;
 import android.view.Display;
 import android.view.DisplayInfo;
+import android.view.Surface;
 
 public class ScreenshotHelper extends BaseHelper {
 
@@ -42,7 +44,11 @@ public class ScreenshotHelper extends BaseHelper {
 
     public int getRotation() {
         try {
-            return getWindowsManager().getRotation();
+            if (Build.VERSION.SDK_INT <= 25) {
+                return getWindowsManager().getRotation();
+            } else {
+                return getWindowsManager().getDefaultDisplayRotation();
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -87,8 +93,17 @@ public class ScreenshotHelper extends BaseHelper {
             mScale = mSize <= 0 ? 1 : mSize * 1f / Math.min(mScreenSize.x, mScreenSize.y);
         }
 
-        Bitmap b = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot",
-                Integer.TYPE, Integer.TYPE).invoke(null, (int) (mScreenSize.x * mScale), (int) (mScreenSize.y * mScale));
+        int width = (int) (mScreenSize.x * mScale);
+        int height = (int) (mScreenSize.y * mScale);
+        Bitmap b = null;
+        if (Build.VERSION.SDK_INT <= 28) {
+            b = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot",
+                    Integer.TYPE, Integer.TYPE).invoke(null, width, height);
+        } else {
+            b = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot",
+                    Rect.class, Integer.TYPE, Integer.TYPE, Integer.TYPE)
+                    .invoke(null, new Rect(0, 0, width, height), width, height, Surface.ROTATION_0);
+        }
         if (b == null) {
             throw new NullPointerException("screenshot method return null !!");
         }
@@ -105,7 +120,9 @@ public class ScreenshotHelper extends BaseHelper {
         } else if (rotation == 3) {
             m.postRotate(-270.0f);
         }
-        return Bitmap.createBitmap(b, 0, 0, mScreenSize.x, mScreenSize.y, m, false);
+        Bitmap result = Bitmap.createBitmap(b, 0, 0, width, height, m, false);
+        b.recycle();
+        return result;
     }
 
 }

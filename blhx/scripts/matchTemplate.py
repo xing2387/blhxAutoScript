@@ -80,8 +80,9 @@ def matchSingleTemplate(sourceImg, templateImg, threshold, mask=None, mark=False
     return result
 
 
-def matchMutiTemplateInRect(sourceImg, templateImgs, threshold, rect, outFilename=None, masks=None, mark=False):
-    sourceImg = sourceImg[rect.y:rect.y + rect.height, rect.x:rect.x + rect.width]
+def matchMutiTemplateInRect(sourceImg, templateImgs, threshold, rect=None, outFilename=None, masks=None, mark=False):
+    if rect:
+        sourceImg = sourceImg[rect.y:rect.y + rect.height, rect.x:rect.x + rect.width]
     # showimg(sourceImg)
     result = matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename, masks, mark)
     if len(result) > 0:
@@ -102,10 +103,8 @@ def matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename=None, mask
             w = w0
     pointsList = []
     with Pool(5) as p:
-        # func = functools.partial(matchSingleTemplate, sourceImg, threshold=threshold, mark=mark)
-# def matchSingleTemplate(sourceImg, templateImg, threshold, mask=None, mark=False):
         for i in range(0, len(templateImgs)):
-            print("--------- " + str(i))
+            # print("--------- " + str(i))
             mask = None
             if masks:
                 mask =  masks[i]
@@ -115,7 +114,7 @@ def matchMutiTemplate(sourceImg, templateImgs, threshold, outFilename=None, mask
         for pt in pts:
             points.append([pt[0], pt[1]])
     points.sort(key=lambda x: [x[0], x[1]])
-    print("~~~~~~~~~~~~~~~~~~~ " + str(points))
+    print("~~~~~~~~~~~~~~~~~~~matchMutiTemplate " + str(points))
     result = filterPoints(points, w, h)
     if outFilename:
         cv.imwrite(outFilename, sourceImg)
@@ -146,7 +145,7 @@ if __name__ == "__main__":
     # # for xx in files_source:
     # #     print(matchMutiTemplate(cv.imread(xx), templateImgs, 0.4, mask=maskImg))
     # print("totel time used: " + str(time.time() - tStart))
-    getpic.downloadScreenshot("/tmp/sss.jpg")
+    getpic.downloadScreenshot("/tmp/sss.jpg", "10.42.0.54:5555")
     img = cv.imread("/tmp/sss.jpg")
     # showimg(img)
     # img = cv.imread(base_dir+"/image1_screenshot_13.07.2019.png")
@@ -160,9 +159,10 @@ if __name__ == "__main__":
     # m2 = np.float32([[0, 0], [imgW, 0], [0, imgH], [imgW, imgH]])
 
     # M = cv.getPerspectiveTransform(m1, m2)
-    # dst = cv.warpPerspective(img, M, (imgW, imgH), cv.INTER_LINEAR)
-    # showimg(dst)
-    template = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/enemy_icons/t2.png")
+    # dst = cv.warpPerspective(img, M, (imgW, imgH), cv.INTER_LINEAR)x-special/nautilus-clipboard
+    # showimg(dst)x-special/nautilus-clipboardx-special/nautilus-clipboard
+
+    template = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/buttons/nextchapter.png")
     mask = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/enemy_icons/mask2.png")
-    result = matchSingleTemplate(img, template, 0.8, None, True)
+    result = matchSingleTemplate(img, template, 0.9, None, False)
     # print(result)

@@ -30,8 +30,7 @@ def screenshotStart(device=None):
     adb = getAdbCommend(device)
     if checkProcessExist(device):
         return
-    os.system(adb + ' forward tcp:50087 tcp:50087')
-    os.system(adb + ' forward tcp:50088 tcp:50088')
+    forward(device)
     os.system(
         adb + " shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; if [[ ! -e $x ]] then mkdir $x;fi'"
     )
@@ -49,6 +48,11 @@ def screenshotStart(device=None):
         ''')
     time.sleep(3)   #wait for the service start
     Started.setStarted(True)
+
+def forward(device=None):
+    adb = getAdbCommend(device)
+    os.system(adb + ' forward tcp:50087 tcp:50087')
+    os.system(adb + ' forward tcp:50088 tcp:50088')
 
 def rootScreenshotStart(device=None):
     print("screenshotStart ")
@@ -77,7 +81,7 @@ def checkProcessExist(device=None):
     result = os.popen(adb + ' shell "netstat -tnl | grep 5008"')
     started = "5008" in result.read()
     Started.setStarted(started)
-    print("checkProcessExist: " + str(started))
+    print("checkProcessExist: " + str(started) + ", device " + str(device))
     return Started.isStarted()
 
 
@@ -108,7 +112,7 @@ def screenshotStop2(device=None):
         )
 
 def downloadScreenshot(outputFilename, device=None):
-    print("downloadScreenshot ")
+    print("downloadScreenshot to file "+ str(outputFilename)+", from device " + str(device))
     if checkProcessExist(device):
         req = requests.get('http://127.0.0.1:50087/screenshot?format="jpg"')
         with open(outputFilename, "wb") as outFile:
@@ -117,8 +121,8 @@ def downloadScreenshot(outputFilename, device=None):
 
 if __name__ == "__main__":
     action = sys.argv[1]
-    if len(sys.argv) == 2:
-        sys.argv.append(None)
+    sys.argv.append(None)
+    sys.argv.append(None)
     if "start" == action:
         screenshotStart(sys.argv[2])
     elif "root" == action:
@@ -130,7 +134,9 @@ if __name__ == "__main__":
     elif "check" == action:
         checkProcessExist(sys.argv[2])
     elif "shot" == action:
-        downloadScreenshot(sys.argv[2])
+        downloadScreenshot(sys.argv[2], sys.argv[3])
+    elif "forward" == action:
+        forward(sys.argv[2])
     # checkProcessExist()
     # screenshotStart()
     # downloadScreenshot("/tmp/sss.jpg")

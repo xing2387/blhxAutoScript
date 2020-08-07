@@ -50,10 +50,9 @@ class Configure():
         if not cls.__scenes:
             print("init __scenes")
             scenes = cls.getConf()["scenes"]
-            cls.__scenes = []
+            cls.__scenes = {}
             for scence in scenes:
-                cls.__scenes.append(
-                    Scene(scence["name"], scence["templates"]))
+                cls.__scenes[scence["name"]] = Scene(scence["name"], scence["templates"])
         return cls.__scenes
 
     @classmethod
@@ -157,7 +156,7 @@ class Scene():
         self.templates = []
         for t in templates:
             self.templates.append(
-                Template(t["path"], t["rect"], t["name"], t["threshold"]))
+                Template(t["path"], t.setdefault("rect", None), t["name"], t["threshold"]))
 
 
 class Template():
@@ -165,7 +164,7 @@ class Template():
 
     @classmethod
     def parseFromDict(cls, dataDict):
-        return Template(dataDict["path"], dataDict["rect"], dataDict["name"], dataDict["threshold"])
+        return Template(dataDict["path"], dataDict.setdefault("rect", None), dataDict["name"], dataDict["threshold"])
 
     def __init__(self, path, rect, name, threshold):
         self.rect = None

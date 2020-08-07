@@ -14,14 +14,15 @@ def showimg(img):
 
 
 def witchScence(sourceImg, preferStartIndex=0):
-    count = len(Configure.getScenes())
+    count = len(Configure.getScenes().values())
     if preferStartIndex >= count:
         return "halt" #返回一个不存在的场景让它报错
     
     fistIndex = preferStartIndex - count
+    origList = list(Configure.getScenes().values())
     scenes = []
     for x in range(fistIndex, preferStartIndex):
-        scenes.append(Configure.getScenes()[x])
+        scenes.append(origList[x])
     for scence in scenes:
         points = []
         found = len(scence.templates) > 0

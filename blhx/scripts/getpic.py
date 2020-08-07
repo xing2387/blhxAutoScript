@@ -40,10 +40,13 @@ def screenshotStart(device=None):
     os.system(
         adb + ''' shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; 
             export CLASSPATH=$x/classes.dex; 
-            exec app_process $x xxx.xxx.screenshotapp.MainScreenShot & 
-            exec app_process $x xxx.xxx.screenshotapp.MainControl & '  &
-        '''
-    )
+            exec app_process $x xxx.xxx.screenshotapp.MainControl'  &
+        ''')
+    os.system(
+        adb + ''' shell 'x=/sdcard/Android/data/xxx.xxx.screenshotapp; 
+            export CLASSPATH=$x/classes.dex; 
+            exec app_process $x xxx.xxx.screenshotapp.MainScreenShot'  &
+        ''')
     time.sleep(3)   #wait for the service start
     Started.setStarted(True)
 

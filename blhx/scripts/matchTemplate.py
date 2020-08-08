@@ -34,8 +34,7 @@ def hasItem(sourceImg, templateImg, threshold, mask=None, mark=False):
 
 
 def hasItemInRect(sourceImg, templateImg, threshold, rect, mask=None, mark=False):
-    loc = matchSingleTemplateInRect(
-        sourceImg, templateImg, threshold, rect, mask, mark)
+    loc = matchSingleTemplateInRect(sourceImg, templateImg, threshold, rect, mask, mark)
     print(loc)
     return len(loc) > 0, loc
 
@@ -44,8 +43,7 @@ def matchSingleTemplateInRect(sourceImg, templateImg, threshold, rect, mask=None
     ''' Args:
             rect: Object of class Rect with '__slots__ = "x", "y", "width", "height"'
     '''
-    sourceImg = sourceImg[rect.y:rect.y +
-                          rect.height, rect.x:rect.x + rect.width]
+    sourceImg = sourceImg[rect.y:rect.y + rect.height, rect.x:rect.x + rect.width]
     # showimg(sourceImg)
     result = matchSingleTemplate(sourceImg, templateImg, threshold, mask, mark)
     if len(result) > 0:
@@ -162,9 +160,9 @@ if __name__ == "__main__":
     # dst = cv.warpPerspective(img, M, (imgW, imgH), cv.INTER_LINEAR)x-special/nautilus-clipboard
     # showimg(dst)x-special/nautilus-clipboardx-special/nautilus-clipboard
 
-    template = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/buttons/cancel.png")
+    template = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/buttons/self.png")
     mask = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/enemy_icons/mask2.png")
-    result = matchSingleTemplate(img, template, 0.99, None, True)
+    result = matchSingleTemplate(img, template, 0.8, None, True)
     # print(result)
 
     # h=[140, 150]

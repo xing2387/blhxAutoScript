@@ -323,32 +323,32 @@
         {
             "name": "lastchapter",
             "threshold": 0.9,
-            "path": "b#lastchapter.png",
-            "rect": [90, 480, 40, 120]
+            "path": "b#lastchapter.png"
         },
         {
             "name": "nextchapter",
             "threshold": 0.9,
-            "path": "b#nextchapter.png",
-            "rect": [1800, 490, 40, 120]
+            "path": "b#nextchapter.png"
         },
         {
             "name": "shot",
             "threshold": 0.9,
-            "path": "b#shot.png",
-            "rect": [1400, 880, 350, 150]
+            "path": "b#shot.png"
         },
         {
             "threshold": 0.9,
             "name": "autofight",
-            "path": "b#autofight.png",
-            "rect": [120, 30, 90, 90]
+            "path": "b#autofight.png"
         },
         {
             "threshold": 0.9,
             "name": "avoid",
-            "path": "b#avoid.png",
-            "rect": [1190, 500, 330, 110]
+            "path": "b#avoid.png"
+        },
+        {
+            "threshold": 0.7,
+            "name": "self",
+            "path": "b#self.png"
         }
     ]
 }

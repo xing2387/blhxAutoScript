@@ -177,15 +177,23 @@ def findEnemies(sourceImg, enemyIconsImg, enemyIconsMask):
 
 
 def clickToFight(pt):
-    click(pt[0]+10, pt[1]+40, 60, 60, 80)
+    click(pt[0]+40, pt[1]+60, 90, 60, 80)
 
-def isSubchapterScene():
+def isSubchapterScene(sourceImg=None):
+    if sourceImg is None:
+        sourceImg = getScreenshot()
     subTemplate = Configure.getScenes()['subchapter'].templates[0].path
-    sourceImg = getScreenshot()
     locs = matchTemplate.matchSingleTemplate(sourceImg, cv.imread(subTemplate), 0.9)
     return len(locs) > 0
-    
 
+def findSelfLocation(sourceImg=None):
+    if sourceImg is None:
+        sourceImg = getScreenshot()
+    selfIcon = Configure.getButton("self")
+    hasItem, location = matchTemplate.hasItem(sourceImg, cv.imread(selfIcon.path), selfIcon.threshold)
+    return location
+
+minDistance = 100
 def subchapter(locations, sourceImg, subchapterName):
     global limitMove
     s, e = splitSubchapterName(subchapterName)
@@ -200,31 +208,54 @@ def subchapter(locations, sourceImg, subchapterName):
         enemyIconsMask.append(cv.imread(enemyIcon))
     bossIconImg = cv.imread(subchapter.enemyIcons[0])
     bossIconMask = cv.imread(subchapter.enemyIcons[int(iconCount/2)])
+    checkIsSubchapter = False
     while count > 0:
         count -= 1
         print("subchapter")
-        if not isSubchapterScene():
-            time.sleep(15)
-            return 'battleend'
         sourceImg = getScreenshot()
+        if checkIsSubchapter and not isSubchapterScene(sourceImg):
+            bb = Configure.getScenes()["formation"].templates[0]
+            hasItem, aa = matchTemplate.hasItem(sourceImg, cv.imread(bb.path), bb.threshold)
+            if hasItem:
+                return 'formation'
+            else:
+                time.sleep(15)
+                return 'battleend'
         bossLoc = findEnemies(sourceImg, [bossIconImg], [bossIconMask])
         if len(bossLoc) > 0:
             print("foundBoss")
             clickToFight(bossLoc[0])
+            checkIsSubchapter = True
             time.sleep(5)
             continue
         locs = findEnemies(sourceImg, enemyIconsImg, enemyIconsMask)
         if len(locs) <= 0:
-            # drag
+            inputhelper.dragRandom()
             continue
         if limitMove:
-            Configure.getButton("self1")
-            clickToFight([locs[-1][0] / 3, locs[-1][1] / 3])
+            selfLoc = findSelfLocation(sourceImg)
+            if len(selfLoc) > 0:
+                print("self not found")
+                selfLoc = selfLoc[-1]
+            else:
+                print("self found")
+                inputhelper.dragRandom()
+                checkIsSubchapter = False
+                continue
+            global minDistance
+            distH = (selfLoc[0] - locs[-1][0])
+            distV = (selfLoc[1] - locs[-1][1])
+            if not distH * distH + distV + distV < minDistance * minDistance:
+                distH = distH / 2
+                distV = distV / 2
+            print("limitMove self: " + str(selfLoc) + ", dist "+ str(distH) +", " + str(distV) + ", loc "+ str(locs[-1]))
+            clickToFight([selfLoc[0] - distH , selfLoc[1] - distV])
+            checkIsSubchapter = True
             time.sleep(3)
         else:
             clickToFight(locs[-1])
+            checkIsSubchapter = True
             time.sleep(5)
-
     return None
 
 
@@ -232,8 +263,15 @@ def formation(locations, sourceImg, subchapterName):
     locations = locations[0][0]
     print(locations)
     click(locations[0]+10, locations[1]+10, 330, 140, 80)
-    time.sleep(15)
-    return 'battleend'
+    time.sleep(2)
+
+    bb = Configure.getScenes()["formation"].templates[0]
+    hasItem, aa = matchTemplate.hasItem(sourceImg, cv.imread(bb.path), bb.threshold)
+    if not hasItem:   
+        time.sleep(15)
+        return 'battleend'
+    else:
+        return 'formation'
 
 def victory(locations, sourceImg, subchapterName):
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)

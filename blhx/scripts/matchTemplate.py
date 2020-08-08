@@ -145,7 +145,7 @@ if __name__ == "__main__":
     # # for xx in files_source:
     # #     print(matchMutiTemplate(cv.imread(xx), templateImgs, 0.4, mask=maskImg))
     # print("totel time used: " + str(time.time() - tStart))
-    getpic.downloadScreenshot("/tmp/sss.jpg", "10.42.0.54:5555")
+    getpic.downloadScreenshot("/tmp/sss.jpg")
     img = cv.imread("/tmp/sss.jpg")
     # showimg(img)
     # img = cv.imread(base_dir+"/image1_screenshot_13.07.2019.png")
@@ -162,7 +162,17 @@ if __name__ == "__main__":
     # dst = cv.warpPerspective(img, M, (imgW, imgH), cv.INTER_LINEAR)x-special/nautilus-clipboard
     # showimg(dst)x-special/nautilus-clipboardx-special/nautilus-clipboard
 
-    template = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/buttons/nextchapter.png")
+    template = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/buttons/cancel.png")
     mask = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/enemy_icons/mask2.png")
-    result = matchSingleTemplate(img, template, 0.9, None, False)
+    result = matchSingleTemplate(img, template, 0.99, None, True)
     # print(result)
+
+    # h=[140, 150]
+    # s=[102, 127]
+    # v=[114, 250]
+    # imgHSV = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+    # hsvSplit = cv.split(imgHSV)
+    # hsvSplit[2] = cv.equalizeHist(hsvSplit[2])
+    # imgHSV = cv.merge(hsvSplit, imgHSV)
+    # print(imgHSV)
+    # showimg(img)

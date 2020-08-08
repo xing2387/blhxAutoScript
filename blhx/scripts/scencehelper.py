@@ -13,8 +13,13 @@ def showimg(img):
     cv.destroyAllWindows()
 
 
-def witchScence(sourceImg, preferStartIndex=0):
+def witchScence(sourceImg, preferStartIndex=0, preferStartLabel=None):
     count = len(Configure.getScenes().values())
+    if preferStartLabel:
+        for x in range(count):
+            if list(Configure.getScenes().values())[x].name == preferStartLabel:
+                preferStartIndex = x
+
     if preferStartIndex >= count:
         return "halt" #返回一个不存在的场景让它报错
     

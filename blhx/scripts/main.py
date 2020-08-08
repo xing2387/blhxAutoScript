@@ -18,6 +18,10 @@ from functools import partial as fpartial
 from configurehelper import Configure, Scene, Template, Rect
 import matchTemplate
 
+#===============记录================
+battleCount = {}
+bossCount = {}
+#===================================
 
 def click(x, y, w, h, deltaT):
     x = x + w * random.random()
@@ -29,7 +33,7 @@ def home(locations, sourceImg, subchapterName):
     pt = locations[0][0]
     click(pt[0], pt[1], 150, 80, 30)
     time.sleep(2)
-    return 1
+    return 'precombat'
 
 
 def getScreenshot():
@@ -41,14 +45,21 @@ def getScreenshot():
 def findChapter(subchapterName):
     # goto first chapter by clicking last chapter btn 10 times
     s, e = splitSubchapterName(subchapterName)
+    sourceImg = getScreenshot()
     chapter = Configure.getChapter(s)
+    template = chapter.labels[0]
+    templateImg = cv.imread(template.path)
+    hasChapter, loc = matchTemplate.hasItem(sourceImg, templateImg, template.threshold)
+    if hasChapter:
+        click(loc[0][0], loc[0][1], 20, 20, 50)
+        return
+
     page = chapter.pageIndex
     count = 12
     btnLeft = Configure.getButton("lastchapter")
     btnright = Configure.getButton("nextchapter")
     imgLeftBtn = cv.imread(btnLeft.path)
     imgRightBtn = cv.imread(btnright.path)
-    sourceImg = getScreenshot()
     hasLeft, locL = matchTemplate.hasItem(sourceImg, imgLeftBtn, btnLeft.threshold)
     hasRight, locR = matchTemplate.hasItem(sourceImg, imgRightBtn, btnright.threshold)
     if hasLeft:
@@ -94,10 +105,8 @@ def findChapter(subchapterName):
             i = min(count, i + 1)
     count = extraRight
     sourceImg = getScreenshot()
-    hasLeft, loc = matchTemplate.hasItem(
-        sourceImg, imgLeftBtn, btnLeft.threshold)
-    hasRight, loc = matchTemplate.hasItem(
-        sourceImg, imgRightBtn, btnright.threshold)
+    hasLeft, loc = matchTemplate.hasItem(sourceImg, imgLeftBtn, btnLeft.threshold)
+    hasRight, loc = matchTemplate.hasItem(sourceImg, imgRightBtn, btnright.threshold)
     if not hasRight:
         print("btn lastChapter not found")
         count = 10 - page
@@ -131,20 +140,26 @@ def precombat(locations, sourceImg, subchapterName):
             attempt += 1
         if attempt < attemptTimes:
             time.sleep(2)
-            return
+            return 'gofight'
 
         print("could not find subchapter label " + subchapterName)
         findChapter(subchapterName)
     except KeyError:
         print(subchapterName + " chapter configuration not found")
+    return 'precombat'
     # Configure.getSubchapters[]
     # pts = matchTemplate.matchSingleTemplate()
 
 
 def gofight(locations, sourceImg, subchapterName):
+    global lastScene
     pt = locations[0][0]
     click(pt[0], pt[1], 150, 60, 30)
-    return 3
+    time.sleep(5)
+    if lastScene == 'precombat':
+        return 'gofight'
+    else:
+        return 'subchapter'
 
 
 def shortEnemyPositionList(points, shortOrder):
@@ -162,7 +177,7 @@ def findEnemies(sourceImg, enemyIconsImg, enemyIconsMask):
 
 
 def clickToFight(pt):
-    click(pt[0]+10, pt[1]+10, 60, 60, 80)
+    click(pt[0]+10, pt[1]+40, 60, 60, 80)
 
 def isSubchapterScene():
     subTemplate = Configure.getScenes()['subchapter'].templates[0].path
@@ -172,6 +187,7 @@ def isSubchapterScene():
     
 
 def subchapter(locations, sourceImg, subchapterName):
+    global limitMove
     s, e = splitSubchapterName(subchapterName)
     subchapter = Configure.getSubchapter(s, e)
     count = subchapter.fight
@@ -180,88 +196,155 @@ def subchapter(locations, sourceImg, subchapterName):
     iconCount = len(subchapter.enemyIcons)
     for enemyIcon in subchapter.enemyIcons[1:int(iconCount/2)]:
         enemyIconsImg.append(cv.imread(enemyIcon))
-        print("=========== " + str(int(iconCount/2)) +", "+str(enemyIcon))
     for enemyIcon in subchapter.enemyIcons[int(iconCount/2)+1:]:
         enemyIconsMask.append(cv.imread(enemyIcon))
     bossIconImg = cv.imread(subchapter.enemyIcons[0])
     bossIconMask = cv.imread(subchapter.enemyIcons[int(iconCount/2)])
-    bossLoc = findEnemies(sourceImg, [bossIconImg], [bossIconMask])
-    if len(bossLoc) > 0:
-        print("findBoss")
-        clickToFight([bossLoc[0][0], bossLoc[0][1]])
-        return 3
     while count > 0:
+        count -= 1
         print("subchapter")
         if not isSubchapterScene():
-            return 3
+            time.sleep(15)
+            return 'battleend'
         sourceImg = getScreenshot()
+        bossLoc = findEnemies(sourceImg, [bossIconImg], [bossIconMask])
+        if len(bossLoc) > 0:
+            print("foundBoss")
+            clickToFight(bossLoc[0])
+            time.sleep(5)
+            continue
         locs = findEnemies(sourceImg, enemyIconsImg, enemyIconsMask)
         if len(locs) <= 0:
             # drag
             continue
-        clickToFight([locs[-1][0], locs[-1][1]])
-        time.sleep(7)
-        count -= 1
-    return 3
+        if limitMove:
+            Configure.getButton("self1")
+            clickToFight([locs[-1][0] / 3, locs[-1][1] / 3])
+            time.sleep(3)
+        else:
+            clickToFight(locs[-1])
+            time.sleep(5)
+
+    return None
 
 
 def formation(locations, sourceImg, subchapterName):
     locations = locations[0][0]
     print(locations)
     click(locations[0]+10, locations[1]+10, 330, 140, 80)
-
-
-def fighting(locations, sourceImg, subchapterName):
-    btnAutoFight = Configure.getButton("autofight")
-    btnAutoFightImg = cv.imread(btnAutoFight.path)
-    found, loc = matchTemplate.hasItem(sourceImg, btnAutoFightImg, btnAutoFight.threshold)
-    if found:
-        sourceImg = getScreenshot()
-        found, loc = matchTemplate.hasItem(sourceImg, btnAutoFightImg, btnAutoFight.threshold)
-    if found:
-        click(70, 50, 270, 60, 80)
-        time.sleep(3)
-        click(230, 450, 200, 250, 70)
-    time.sleep(50)
-    scence, locations = scencehelper.witchScence(getScreenshot())
-    while scence == 'fighting':
-        time.sleep(10)
-        scence, locations = scencehelper.witchScence(getScreenshot())
-    time.sleep(4)
-    if scence == 'victory':
-        return victory(locations, sourceImg, subchapterName)
-    else:
-        return 5
-
+    time.sleep(15)
+    return 'battleend'
 
 def victory(locations, sourceImg, subchapterName):
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
     time.sleep(5)
-    return 6
+    return 'subchapter'
 
 
 def getitem(locations, sourceImg, subchapterName):
+    global lastScene
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
     time.sleep(7)
-    return 7
+    if lastScene == 'disbandY':
+        return 'sellweapon'
+    elif lastScene == 'aftersale':
+        return 'disband'
+    elif lastScene == 'battleend':
+        return 'victory'
+    elif lastScene == 'neterror':
+        return 'sellweapon'
+    return None
 
 
 def getship(locations, sourceImg, subchapterName):
-    click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
+    click(locations[0][0][0] - 200, locations[0][0][1] - 200, 100, 50, 70)
     time.sleep(7)
-    return 8
+    return 'getitem'
 
 
 def battleend(locations, sourceImg, subchapterName):
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
-    time.sleep(7)
-    return 3
+    time.sleep(3)
+    return 'getitem'
 
 def avoid(locations, sourceImg, subchapterName):
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
     time.sleep(4)
-    return 3
+    return 'subchapter'
 
+def full(locations, sourceImg, subchapterName):
+    click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
+    time.sleep(4)
+    return 'disband'
+
+def clickSceneTemplate(locations, sourceImg, subchapterName):
+    click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
+    time.sleep(4)
+    return
+
+def clickYes(locations, sourceImg, subchapterName):
+    btn = Configure.getButton("yes")
+    hasItem, loc = matchTemplate.hasItem(sourceImg, cv.imread(btn.path), btn.threshold)
+    if hasItem:
+        click(x=loc[0][0], y=loc[0][1], w=50, h=50, deltaT=50)
+    time.sleep(4)
+    return
+
+def clickCancel(locations, sourceImg, subchapterName):
+    btn = Configure.getButton("cancel")
+    hasItem, loc = matchTemplate.hasItem(sourceImg, cv.imread(btn.path), btn.threshold)
+    if hasItem:
+        click(x=loc[0][0], y=loc[0][1], w=50, h=50, deltaT=50)
+    time.sleep(4)
+    return
+
+def sellweapon(locations, sourceImg, subchapterName):
+    clickYes(locations, sourceImg, subchapterName)
+    clickCancel(locations, sourceImg, subchapterName)
+    return 'getitem'
+
+def ok(locations, sourceImg, subchapterName):
+    global lastScene
+    loc = locations[0][0]
+    locations[0][0] = (loc[0] + 140, loc[1] + 10)
+    clickSceneTemplate(locations, sourceImg, subchapterName)
+    return lastScene
+
+needDisBand = True
+def disband(locations, sourceImg, subchapterName):
+    global needDisBand
+    if needDisBand:
+        clickSceneTemplate(locations, sourceImg, subchapterName)
+        return 'disbandY'
+    else:
+        clickCancel(locations, sourceImg, subchapterName)
+        sourceImg = getScreenshot()
+        disbandLabel = Configure.getScenes()['disband'].templates[0]
+        hasItem, loc = matchTemplate.hasItem(sourceImg, cv.imread(disbandLabel.path), disbandLabel.threshold)
+        if not hasItem:
+            needDisBand = True
+        return None
+
+def disbandY(locations, sourceImg, subchapterName):
+    global needDisBand
+    clickYes(locations, sourceImg, subchapterName)
+    needDisBand = False
+    return 'getitem'
+
+def sellweapon(locations, sourceImg, subchapterName):
+    clickYes(locations, sourceImg, subchapterName)
+    return 'aftersale'
+
+def neterror(locations, sourceImg, subchapterName):
+    global lastScene
+    clickYes(locations, sourceImg, subchapterName)
+    if lastScene == 'disbandY':
+        return 'getitem'
+    return lastScene
+
+def aftersale(locations, sourceImg, subchapterName):
+    clickYes(locations, sourceImg, subchapterName)
+    return 'getitem'
 
 actionFunctions = {
     #主页面
@@ -274,20 +357,31 @@ actionFunctions = {
     'avoid':        avoid,
     #进入第几章中
     'subchapter':   subchapter,
+    #船坞已满
+    'full':         full,
+    #退役
+    'disband':      disband,
+    #确定退役
+    'disbandY':     disbandY,
+    #拆解武器
+    'sellweapon':   sellweapon,
     #“编队”页面，点击进入“战斗”页
     'formation':    formation,
-    #“战斗”页
-    'fighting':     fighting,
     'victory':      victory,
+    #点击继续
     'getitem':      getitem,
     'getship':      getship,
-    'battleend':    battleend
+    #战斗评价页
+    'battleend':    battleend,
+    'ok':           ok,
+    'neterror':     neterror,
+    'aftersale':    aftersale
 }
 
 
 def splitSubchapterName(subchapterName):
     s, e = splitSubchapter(subchapterName)
-    return 's' + s, 'e' + e
+    return s, e
 
 
 def splitSubchapter(subchapterName):
@@ -295,26 +389,33 @@ def splitSubchapter(subchapterName):
 
 
 def battle(subchapterName, preferSenceIndex=0):
+    preferStartLabel = None
     while True:
         sourceImg = getScreenshot()
-        scence, locations = scencehelper.witchScence(sourceImg, preferSenceIndex)
+        scence, locations = scencehelper.witchScence(sourceImg, preferSenceIndex, preferStartLabel)
         if scence:
             print(scence)
-            actionFunctions[scence](locations, sourceImg, subchapterName)
+            lastScene = scence
+            preferStartLabel = actionFunctions[scence](locations, sourceImg, subchapterName)
         else:  # error, try again
-            time.sleep(4)
+            time.sleep(3)
 
 device = None
-
+limitMove = False
+lastScene = None
 def main(argv):
     global device
-    opts, args = getopt.getopt(argv, "c:d:", ["chapter=", "device="])
+    global limitMove
+    opts, args = getopt.getopt(argv, "c:d:l:", ["chapter=", "device=", "limie="])
     subchapterName = None
     for opt, arg in opts:
         if opt in ("-c", "--chapter"):
             subchapterName = arg
         elif opt in ("-d", "--device"):
             device = arg
+            print("device "+str(device))
+        elif opt in ("-l", "--limit"):
+            limitMove = (arg == "True")
             print("device "+str(device))
     # print(isSubchapterScene())
     getpic.screenshotStart(device)

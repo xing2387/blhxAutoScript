@@ -43,8 +43,47 @@
                 {
                     "threshold": 0.9,
                     "name": "avoid",
-                    "path": "b#avoid.png",
-                    "rect": [1190, 500, 330, 110]
+                    "path": "b#avoid.png"
+                }
+            ]
+        },
+        {
+            "name": "full",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "full",
+                    "path": "st#full.png"
+                }
+            ]
+        },
+        {
+            "name": "disband",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "disband",
+                    "path": "st#disband.png"
+                }
+            ]
+        },
+        {
+            "name": "disbandY",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "disbandY",
+                    "path": "st#disbandY.png"
+                }
+            ]
+        },
+        {
+            "name": "sellweapon",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "sellweapon",
+                    "path": "st#sellweapon.png"
                 }
             ]
         },
@@ -52,10 +91,9 @@
             "name": "subchapter",
             "templates": [
                 {
-                    "threshold": 0.8,
+                    "threshold": 0.9,
                     "name": "subchapter",
-                    "path": "st#subchapter.png",
-                    "rect": [1600, 970, 230, 80]
+                    "path": "st#subchapter.png"
                 }
             ]
         },
@@ -65,19 +103,7 @@
                 {
                     "threshold": 0.9,
                     "name": "formation",
-                    "path": "st#formation.png",
-                    "rect": [1400, 880, 350, 150]
-                }
-            ]
-        },
-        {
-            "name": "fighting",
-            "templates": [
-                {
-                    "threshold": 0.95,
-                    "name": "pause",
-                    "path": "b#pause.png",
-                    "rect": [1800, 25, 90, 90]
+                    "path": "st#formation.png"
                 }
             ]
         },
@@ -87,8 +113,7 @@
                 {
                     "threshold": 0.9,
                     "name": "victory",
-                    "path": "st#victory.png",
-                    "rect": [330, 680, 350, 90]
+                    "path": "st#victory.png"
                 }
             ]
         },
@@ -98,8 +123,7 @@
                 {
                     "threshold": 0.9,
                     "name": "getitem",
-                    "path": "st#getitem.png",
-                    "rect": [740, 196, 450, 110]
+                    "path": "st#getitem.png"
                 }
             ]
         },
@@ -109,8 +133,7 @@
                 {
                     "threshold": 0.9,
                     "name": "getship",
-                    "path": "st#getship.png",
-                    "rect": [1470, 830, 110, 110]
+                    "path": "st#getship.png"
                 }
             ]
         },
@@ -119,9 +142,38 @@
             "templates": [
                 {
                     "threshold": 0.9,
-                    "name": "battleend_1550_880",
-                    "path": "st#battleend.png",
-                    "rect": [1260, 870, 210, 100]
+                    "name": "battleend",
+                    "path": "st#battleend.png"
+                }
+            ]
+        },
+        {
+            "name": "ok",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "ok",
+                    "path": "st#ok.png"
+                }
+            ]
+        },
+        {
+            "name": "neterror",
+            "templates": [
+                {
+                    "threshold": 0.8,
+                    "name": "neterror",
+                    "path": "st#neterror.png"
+                }
+            ]
+        },
+        {
+            "name": "aftersale",
+            "templates": [
+                {
+                    "threshold": 0.8,
+                    "name": "aftersale",
+                    "path": "st#aftersale.png"
                 }
             ]
         }
@@ -161,16 +213,113 @@
                         "ei#t3.png",
                         "ei#t2.png",
                         "ei#t1.png",
-                        "ei#maskboss.png",
+                        "ei#bonus.png",
+
+                        "ei#boss.png",
                         "ei#mask3.png",
                         "ei#mask2.png",
-                        "ei#mask1.png"
+                        "ei#mask1.png",
+                        "ei#bonus.png"
+                    ]
+                }
+            ]
+        },
+        {
+            "name" : "sp2008",
+            "pageIndex": -1,
+            "templates": {
+                "slabel": [
+                    {
+                        "name" : "slabel",
+                        "threshold": 0.9,
+                        "path": "scl#sp2008.png"
+                    }
+                ]
+            },
+            "subchapters": [
+                {
+                    "name" : "sp1",
+                    "boss_direct": 5,
+                    "fight": 100,
+                    "templates": {
+                        "elabel": [
+                            {
+                                "name" : "elabel",
+                                "threshold": 0.9,
+                                "path": "scl#sp2008sp1.png"
+                            }
+                        ]
+                    },
+                    "enemy_icons": [
+                        "ei#boss.png",
+                        "ei#t3.png",
+                        "ei#t2.png",
+                        "ei#t1.png",
+                        "ei#bonus.png",
+                        
+                        "ei#boss.png",
+                        "ei#mask3.png",
+                        "ei#mask2.png",
+                        "ei#mask1.png",
+                        "ei#bonus.png"
+                    ]
+                }
+            ]
+        },
+        {
+            "name" : "s7",
+            "pageIndex": -1,
+            "templates": {
+                "slabel": [
+                    {
+                        "name" : "slabel",
+                        "threshold": 0.9,
+                        "path": "scl#s7.png"
+                    }
+                ]
+            },
+            "subchapters": [
+                {
+                    "name" : "e2",
+                    "boss_direct": 5,
+                    "fight": 100,
+                    "templates": {
+                        "elabel": [
+                            {
+                                "name" : "elabel",
+                                "threshold": 0.9,
+                                "path": "scl#s7e2.png"
+                            }
+                        ]
+                    },
+                    "enemy_icons": [
+                        "ei#boss.png",
+                        "ei#t3.png",
+                        "ei#t2.png",
+                        "ei#t1.png",
+                        "ei#bonus.png",
+                        
+                        "ei#boss.png",
+                        "ei#mask3.png",
+                        "ei#mask2.png",
+                        "ei#mask1.png",
+                        "ei#bonus.png"
                     ]
                 }
             ]
         }
     ],
     "buttons": [
+        {
+            "name": "yes",
+            "threshold": 0.9,
+            "path": "b#yes.png"
+        },
+        {
+            "name": "cancel",
+            "threshold": 0.9,
+            "path": "b#cancel.png"
+        },
         {
             "name": "lastchapter",
             "threshold": 0.9,

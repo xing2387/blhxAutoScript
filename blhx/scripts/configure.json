@@ -161,7 +161,7 @@
             "name": "neterror",
             "templates": [
                 {
-                    "threshold": 0.8,
+                    "threshold": 0.75,
                     "name": "neterror",
                     "path": "st#neterror.png"
                 }
@@ -263,6 +263,58 @@
                         "ei#mask1.png",
                         "ei#bonus.png"
                     ]
+                },
+                {
+                    "name" : "sp2",
+                    "boss_direct": 5,
+                    "fight": 100,
+                    "templates": {
+                        "elabel": [
+                            {
+                                "name" : "elabel",
+                                "threshold": 0.9,
+                                "path": "scl#sp2008sp2.png"
+                            }
+                        ]
+                    },
+                    "enemy_icons": [
+                        "ei#boss.png",
+                        "ei#t3.png",
+                        "ei#t2.png",
+                        "ei#t1.png",
+                        "ei#bonus.png",
+                        
+                        "ei#boss.png",
+                        "ei#mask3.png",
+                        "ei#mask2.png",
+                        "ei#mask1.png",
+                        "ei#bonus.png"
+                    ]
+                },
+                {
+                    "name" : "sp3",
+                    "boss_direct": 5,
+                    "fight": 100,
+                    "templates": {
+                        "elabel": [
+                            {
+                                "name" : "elabel",
+                                "threshold": 0.9,
+                                "path": "scl#sp2008sp3.png"
+                            }
+                        ]
+                    },
+                    "enemy_icons": [
+                        "ei#boss.png",
+                        "ei#t3.png",
+                        "ei#t2.png",
+                        "ei#t1.png",
+                        
+                        "ei#boss.png",
+                        "ei#mask3.png",
+                        "ei#mask2.png",
+                        "ei#mask1.png"
+                    ]
                 }
             ]
         },
@@ -349,6 +401,11 @@
             "threshold": 0.7,
             "name": "self",
             "path": "b#self.png"
+        },
+        {
+            "threshold": 0.9,
+            "name": "withdraw",
+            "path": "b#withdraw.png"
         }
     ]
 }

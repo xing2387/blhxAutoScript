@@ -168,10 +168,10 @@ def shortEnemyPositionList(points, shortOrder):
     pass
 
 
-def findEnemies(sourceImg, enemyIconsImg, enemyIconsMask):
+def findEnemies(sourceImg, enemyIconsImg, enemyIconsMask, threshold=0.8):
     # print(sourceImg.shape)
     rect = Rect(0, 0, sourceImg.shape[1], sourceImg.shape[0])
-    locs = matchTemplate.matchMutiTemplateInRect(sourceImg, enemyIconsImg, 0.8, rect, masks=enemyIconsMask)
+    locs = matchTemplate.matchMutiTemplateInRect(sourceImg, enemyIconsImg, threshold, rect, masks=enemyIconsMask)
     shortEnemyPositionList(locs, 1)
     return locs
 
@@ -193,7 +193,29 @@ def findSelfLocation(sourceImg=None):
     hasItem, location = matchTemplate.hasItem(sourceImg, cv.imread(selfIcon.path), selfIcon.threshold)
     return location
 
-minDistance = 100
+def isSelfMoved(lastLoc, selfLoc=None):
+    if selfLoc is None:
+        selfLoc = findSelfLocation(sourceImg)
+        if len(selfLoc) > 0:
+            selfLoc = selfLoc[-1]
+    if selfLoc is not None:
+        print("isSelfMoved " + str(lastLoc[0] - selfLoc[0]) + ", " + str(lastLoc[1] - selfLoc[1]))
+        return abs(lastLoc[0] - selfLoc[0]) > 50 or abs(lastLoc[1] - selfLoc[1]) > 50
+    else:
+        return None
+
+def clickBotton(name):
+    btn = Configure.getButton(name)
+    while True:
+        hasItem, loc = matchTemplate.hasItem(sourceImg, cv.imread(btn.path), btn.threshold)
+        if hasItem:
+            click(x=loc[0][0], y=loc[0][1], w=50, h=50, deltaT=50)
+            time.sleep(3)
+        else:
+            break
+    
+
+minDistance = 500
 def subchapter(locations, sourceImg, subchapterName):
     global limitMove
     s, e = splitSubchapterName(subchapterName)
@@ -208,12 +230,13 @@ def subchapter(locations, sourceImg, subchapterName):
         enemyIconsMask.append(cv.imread(enemyIcon))
     bossIconImg = cv.imread(subchapter.enemyIcons[0])
     bossIconMask = cv.imread(subchapter.enemyIcons[int(iconCount/2)])
-    checkIsSubchapter = False
+    enemyLoc = None
+    limitCount = 3
     while count > 0:
         count -= 1
         print("subchapter")
         sourceImg = getScreenshot()
-        if checkIsSubchapter and not isSubchapterScene(sourceImg):
+        if not isSubchapterScene(sourceImg):
             bb = Configure.getScenes()["formation"].templates[0]
             hasItem, aa = matchTemplate.hasItem(sourceImg, cv.imread(bb.path), bb.threshold)
             if hasItem:
@@ -221,48 +244,74 @@ def subchapter(locations, sourceImg, subchapterName):
             else:
                 time.sleep(15)
                 return 'battleend'
-        bossLoc = findEnemies(sourceImg, [bossIconImg], [bossIconMask])
-        if len(bossLoc) > 0:
-            print("foundBoss")
-            clickToFight(bossLoc[0])
-            checkIsSubchapter = True
-            time.sleep(5)
-            continue
-        locs = findEnemies(sourceImg, enemyIconsImg, enemyIconsMask)
-        if len(locs) <= 0:
-            inputhelper.dragRandom()
-            continue
+        locs = []
+        if enemyLoc is None:
+            locs = findEnemies(sourceImg, [bossIconImg], [bossIconMask], 0.7)
+            if len(locs) <= 0:
+                locs = findEnemies(sourceImg, enemyIconsImg, enemyIconsMask)
+            if len(locs) <= 0:
+                inputhelper.dragRandom()
+                continue
+            enemyLoc = locs[-1]
         if limitMove:
-            selfLoc = findSelfLocation(sourceImg)
-            if len(selfLoc) > 0:
+            lastLoc = findSelfLocation(sourceImg)
+            if len(lastLoc) <= 0:
                 print("self not found")
+                inputhelper.dragRandom()
+                enemyLoc = None
+                continue
+            else:
+                lastLoc = lastLoc[0]
+        clickToFight(enemyLoc)
+        time.sleep(5)
+
+        while limitMove:
+            selfLoc = findSelfLocation(sourceImg)
+            if len(selfLoc) <= 0 or isSelfMoved(lastLoc, selfLoc[0]):
+                limitCount = 3
+                break
+            limitCount -= 1
+            if len(selfLoc) > 0:
+                print("self found")
                 selfLoc = selfLoc[-1]
             else:
-                print("self found")
+                print("self not found")
                 inputhelper.dragRandom()
-                checkIsSubchapter = False
-                continue
+                enemyLoc = None
+                time.sleep(2)
+                break
             global minDistance
-            distH = (selfLoc[0] - locs[-1][0])
-            distV = (selfLoc[1] - locs[-1][1])
-            if not distH * distH + distV + distV < minDistance * minDistance:
+            distH = (selfLoc[0] - enemyLoc[0])
+            distV = (selfLoc[1] - enemyLoc[1])
+            if distH * distH + distV * distV >= minDistance * minDistance:
                 distH = distH / 2
                 distV = distV / 2
-            print("limitMove self: " + str(selfLoc) + ", dist "+ str(distH) +", " + str(distV) + ", loc "+ str(locs[-1]))
+            if limitCount == 0 or distH * distH + distV * distV < 100 * 100:
+                # enemyLoc = None
+                # break
+                if len(locs) == 0:
+                    # clickBotton("withdraw")
+                    # return None
+                    inputhelper.dragRandom()
+                    enemyLoc = None
+                    break
+                else:
+                    locs.remove(enemyLoc)
+                    enemyLoc = locs[-1]
+                    break
+            print("limitMove self: " + str(selfLoc) + ", dist "+ str(distH) +", " + str(distV) + ", loc "+ str(enemyLoc))
             clickToFight([selfLoc[0] - distH , selfLoc[1] - distV])
-            checkIsSubchapter = True
-            time.sleep(3)
-        else:
-            clickToFight(locs[-1])
-            checkIsSubchapter = True
+            lastLoc = selfLoc
             time.sleep(5)
+            sourceImg = getScreenshot()
+            
     return None
 
 
 def formation(locations, sourceImg, subchapterName):
     locations = locations[0][0]
     print(locations)
-    click(locations[0]+10, locations[1]+10, 330, 140, 80)
+    click(locations[0]+10, locations[1]+10, 200, 60, 80)
     time.sleep(2)
 
     bb = Configure.getScenes()["formation"].templates[0]

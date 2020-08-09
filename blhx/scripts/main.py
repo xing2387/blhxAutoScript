@@ -245,12 +245,12 @@ def subchapter(locations, sourceImg, subchapterName):
                 time.sleep(15)
                 return 'battleend'
         locs = []
-        if enemyLoc is None:
+        if (not limitMove) or (enemyLoc is None):
             locs = findEnemies(sourceImg, [bossIconImg], [bossIconMask], 0.7)
             if len(locs) <= 0:
                 locs = findEnemies(sourceImg, enemyIconsImg, enemyIconsMask)
             if len(locs) <= 0:
-                inputhelper.dragRandom()
+                inputhelper.dragRandom(3)
                 continue
             enemyLoc = locs[-1]
         if limitMove:

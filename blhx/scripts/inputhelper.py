@@ -30,7 +30,7 @@ def drag(startx, starty, endx, endy):
     req = requests.get('http://127.0.0.1:50088/sendevent?' + params)
     print(req)
 
-def dragRandom():
+def dragRandom(times=1):
     withNone = ["up","down","left","right", "None", "None"]
     withoutNone = ["up","down","left","right"]
     aa = random.choice(withNone)
@@ -40,7 +40,10 @@ def dragRandom():
         bb = random.choice(withNone)
     directory = aa + "|" + bb
     print("dragRandom " + directory)
-    dragWithDirectory(directory=directory)
+    while times > 0:
+        times -= 1
+        dragWithDirectory(directory=directory)
+        time.sleep(1)
 
 def dragWithDirectory(directory="up", screenW=1920, screenH=1080):
     '''

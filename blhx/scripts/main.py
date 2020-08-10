@@ -242,7 +242,7 @@ def subchapter(locations, sourceImg, subchapterName):
             if hasItem:
                 return 'formation'
             else:
-                time.sleep(15)
+                time.sleep(10)
                 return 'battleend'
         locs = []
         if (not limitMove) or (enemyLoc is None):
@@ -262,7 +262,25 @@ def subchapter(locations, sourceImg, subchapterName):
                 continue
             else:
                 lastLoc = lastLoc[0]
-        clickToFight(enemyLoc)
+        while True:
+            clickToFight(enemyLoc)
+            time.sleep(1)
+            sourceImg = getScreenshot()
+            bb = Configure.getButton("blockout")
+            hasItem, aa = matchTemplate.hasItem(sourceImg, cv.imread(bb.path), bb.threshold)
+            if hasItem:
+                locs.remove(enemyLoc)
+                if len(locs) <= 0:
+                    inputhelper.dragRandom(3)
+                    time.sleep(1)
+                    break
+                else:
+                    enemyLoc = locs[-1]
+                    continue
+            else:
+                break
+                
+
         time.sleep(5)
 
         while limitMove:
@@ -317,21 +335,21 @@ def formation(locations, sourceImg, subchapterName):
     bb = Configure.getScenes()["formation"].templates[0]
     hasItem, aa = matchTemplate.hasItem(sourceImg, cv.imread(bb.path), bb.threshold)
     if not hasItem:   
-        time.sleep(15)
+        time.sleep(10)
         return 'battleend'
     else:
         return 'formation'
 
 def victory(locations, sourceImg, subchapterName):
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
-    time.sleep(5)
+    time.sleep(2)
     return 'subchapter'
 
 
 def getitem(locations, sourceImg, subchapterName):
     global lastScene
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
-    time.sleep(7)
+    time.sleep(3)
     if lastScene == 'disbandY':
         return 'sellweapon'
     elif lastScene == 'aftersale':
@@ -345,28 +363,28 @@ def getitem(locations, sourceImg, subchapterName):
 
 def getship(locations, sourceImg, subchapterName):
     click(locations[0][0][0] - 200, locations[0][0][1] - 200, 100, 50, 70)
-    time.sleep(7)
+    time.sleep(2)
     return 'getitem'
 
 
 def battleend(locations, sourceImg, subchapterName):
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
-    time.sleep(3)
+    time.sleep(2)
     return 'getitem'
 
 def avoid(locations, sourceImg, subchapterName):
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
-    time.sleep(4)
+    time.sleep(2)
     return 'subchapter'
 
 def full(locations, sourceImg, subchapterName):
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
-    time.sleep(4)
+    time.sleep(2)
     return 'disband'
 
 def clickSceneTemplate(locations, sourceImg, subchapterName):
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
-    time.sleep(4)
+    time.sleep(2)
     return
 
 def clickYes(locations, sourceImg, subchapterName):
@@ -374,7 +392,7 @@ def clickYes(locations, sourceImg, subchapterName):
     hasItem, loc = matchTemplate.hasItem(sourceImg, cv.imread(btn.path), btn.threshold)
     if hasItem:
         click(x=loc[0][0], y=loc[0][1], w=50, h=50, deltaT=50)
-    time.sleep(4)
+    time.sleep(2)
     return
 
 def clickCancel(locations, sourceImg, subchapterName):
@@ -382,7 +400,7 @@ def clickCancel(locations, sourceImg, subchapterName):
     hasItem, loc = matchTemplate.hasItem(sourceImg, cv.imread(btn.path), btn.threshold)
     if hasItem:
         click(x=loc[0][0], y=loc[0][1], w=50, h=50, deltaT=50)
-    time.sleep(4)
+    time.sleep(2)
     return
 
 def sellweapon(locations, sourceImg, subchapterName):

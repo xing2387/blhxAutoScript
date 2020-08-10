@@ -62,7 +62,7 @@ class Configure():
             cls.__chapters = {}
             chapters = cls.getConf()["chapters"]
             for chapter in chapters:
-                print(str(chapter))
+                # print(str(chapter))
                 cls.__chapters[chapter["name"]] = Chapter.parseFromDict(chapter)
         return cls.__chapters
 

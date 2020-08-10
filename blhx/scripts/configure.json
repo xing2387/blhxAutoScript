@@ -8,22 +8,62 @@
     },
     "scenes": [
         {
-            "name": "home",
+            "name": "subchapter",
             "templates": [
                 {
                     "threshold": 0.9,
-                    "name": "strike",
-                    "path": "st#home.png"
+                    "name": "subchapter",
+                    "path": "st#subchapter.png"
                 }
             ]
         },
         {
-            "name": "precombat",
+            "name": "victory",
             "templates": [
                 {
                     "threshold": 0.9,
-                    "name": "archor",
-                    "path": "st#precombat.png"
+                    "name": "victory",
+                    "path": "st#victory.png"
+                }
+            ]
+        },
+        {
+            "name": "getitem",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "getitem",
+                    "path": "st#getitem.png"
+                }
+            ]
+        },
+        {
+            "name": "getship",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "getship",
+                    "path": "st#getship.png"
+                }
+            ]
+        },
+        {
+            "name": "battleend",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "battleend",
+                    "path": "st#battleend.png"
+                }
+            ]
+        },
+        {
+            "name": "formation",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "formation",
+                    "path": "st#formation.png"
                 }
             ]
         },
@@ -88,62 +128,12 @@
             ]
         },
         {
-            "name": "subchapter",
+            "name": "aftersale",
             "templates": [
                 {
-                    "threshold": 0.9,
-                    "name": "subchapter",
-                    "path": "st#subchapter.png"
-                }
-            ]
-        },
-        {
-            "name": "formation",
-            "templates": [
-                {
-                    "threshold": 0.9,
-                    "name": "formation",
-                    "path": "st#formation.png"
-                }
-            ]
-        },
-        {
-            "name": "victory",
-            "templates": [
-                {
-                    "threshold": 0.9,
-                    "name": "victory",
-                    "path": "st#victory.png"
-                }
-            ]
-        },
-        {
-            "name": "getitem",
-            "templates": [
-                {
-                    "threshold": 0.9,
-                    "name": "getitem",
-                    "path": "st#getitem.png"
-                }
-            ]
-        },
-        {
-            "name": "getship",
-            "templates": [
-                {
-                    "threshold": 0.9,
-                    "name": "getship",
-                    "path": "st#getship.png"
-                }
-            ]
-        },
-        {
-            "name": "battleend",
-            "templates": [
-                {
-                    "threshold": 0.9,
-                    "name": "battleend",
-                    "path": "st#battleend.png"
+                    "threshold": 0.8,
+                    "name": "aftersale",
+                    "path": "st#aftersale.png"
                 }
             ]
         },
@@ -168,12 +158,22 @@
             ]
         },
         {
-            "name": "aftersale",
+            "name": "home",
             "templates": [
                 {
-                    "threshold": 0.8,
-                    "name": "aftersale",
-                    "path": "st#aftersale.png"
+                    "threshold": 0.9,
+                    "name": "strike",
+                    "path": "st#home.png"
+                }
+            ]
+        },
+        {
+            "name": "precombat",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "archor",
+                    "path": "st#precombat.png"
                 }
             ]
         }
@@ -313,7 +313,7 @@
                         "ei#boss.png",
                         "ei#mask3.png",
                         "ei#mask2.png",
-                        "ei#mask1.png"
+                        "ei#mask3.png"
                     ]
                 }
             ]
@@ -406,6 +406,16 @@
             "threshold": 0.9,
             "name": "withdraw",
             "path": "b#withdraw.png"
+        },
+        {
+            "threshold": 0.9,
+            "name": "pausefighting",
+            "path": "b#pausefighting.png"
+        },
+        {
+            "threshold": 0.9,
+            "name": "blockout",
+            "path": "b#blockout.png"
         }
     ]
 }

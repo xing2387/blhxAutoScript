@@ -1,10 +1,10 @@
 {
     "base_dir": {
-        "st":   "res/scenes/templates/",
-        "ei": "res/enemy_icons/",
-        "scl":  "res/subchapter/labels/",
-        "p":    "res/precombat/",
-        "b":    "res/buttons/"
+        "st": "scenes/templates/",
+        "ei": "enemy_icons/",
+        "scl": "subchapter/labels/",
+        "p": "precombat/",
+        "b": "buttons/"
     },
     "scenes": [
         {
@@ -71,7 +71,7 @@
             "name": "gofight",
             "templates": [
                 {
-                    "name" : "gofight",
+                    "name": "gofight",
                     "threshold": 0.9,
                     "path": "st#gofight.png"
                 }
@@ -181,30 +181,40 @@
     "precombat": {},
     "chapters": [
         {
-            "name" : "s3",
+            "name": "s3",
             "pageIndex": 3,
             "templates": {
                 "slabel": [
                     {
-                        "name" : "slabel",
+                        "name": "slabel",
                         "threshold": 0.9,
                         "path": "scl#s3.png",
-                        "rect": [10, 130, 150, 50]
+                        "rect": [
+                            10,
+                            130,
+                            150,
+                            50
+                        ]
                     }
                 ]
             },
             "subchapters": [
                 {
-                    "name" : "e4",
+                    "name": "e4",
                     "boss_direct": 5,
                     "fight": 100,
                     "templates": {
                         "elabel": [
                             {
-                                "name" : "elabel",
+                                "name": "elabel",
                                 "threshold": 0.9,
                                 "path": "scl#s3e4.png",
-                                "rect": [950, 515, 160, 50]
+                                "rect": [
+                                    950,
+                                    515,
+                                    160,
+                                    50
+                                ]
                             }
                         ]
                     },
@@ -214,7 +224,6 @@
                         "ei#t2.png",
                         "ei#t1.png",
                         "ei#bonus.png",
-
                         "ei#boss.png",
                         "ei#mask3.png",
                         "ei#mask2.png",
@@ -225,28 +234,28 @@
             ]
         },
         {
-            "name" : "sp2008",
+            "name": "sp200820",
             "pageIndex": -1,
             "templates": {
                 "slabel": [
                     {
-                        "name" : "slabel",
+                        "name": "slabel",
                         "threshold": 0.9,
-                        "path": "scl#sp2008.png"
+                        "path": "scl#sp200820.png"
                     }
                 ]
             },
             "subchapters": [
                 {
-                    "name" : "sp1",
+                    "name": "c3",
                     "boss_direct": 5,
                     "fight": 100,
                     "templates": {
                         "elabel": [
                             {
-                                "name" : "elabel",
+                                "name": "elabel",
                                 "threshold": 0.9,
-                                "path": "scl#sp2008sp1.png"
+                                "path": "scl#sp200820c3.png"
                             }
                         ]
                     },
@@ -255,76 +264,21 @@
                         "ei#t3.png",
                         "ei#t2.png",
                         "ei#t1.png",
-                        "ei#bonus.png",
-                        
                         "ei#boss.png",
                         "ei#mask3.png",
                         "ei#mask2.png",
-                        "ei#mask1.png",
-                        "ei#bonus.png"
-                    ]
-                },
-                {
-                    "name" : "sp2",
-                    "boss_direct": 5,
-                    "fight": 100,
-                    "templates": {
-                        "elabel": [
-                            {
-                                "name" : "elabel",
-                                "threshold": 0.9,
-                                "path": "scl#sp2008sp2.png"
-                            }
-                        ]
-                    },
-                    "enemy_icons": [
-                        "ei#boss.png",
-                        "ei#t3.png",
-                        "ei#t2.png",
-                        "ei#t1.png",
-                        "ei#bonus.png",
-                        
-                        "ei#boss.png",
-                        "ei#mask3.png",
-                        "ei#mask2.png",
-                        "ei#mask1.png",
-                        "ei#bonus.png"
-                    ]
-                },
-                {
-                    "name" : "sp3",
-                    "boss_direct": 5,
-                    "fight": 100,
-                    "templates": {
-                        "elabel": [
-                            {
-                                "name" : "elabel",
-                                "threshold": 0.9,
-                                "path": "scl#sp2008sp3.png"
-                            }
-                        ]
-                    },
-                    "enemy_icons": [
-                        "ei#boss.png",
-                        "ei#t3.png",
-                        "ei#t2.png",
-                        "ei#t1.png",
-                        
-                        "ei#boss.png",
-                        "ei#mask3.png",
-                        "ei#mask2.png",
-                        "ei#mask3.png"
+                        "ei#mask1.png"
                     ]
                 }
             ]
         },
         {
-            "name" : "s7",
+            "name": "s7",
             "pageIndex": -1,
             "templates": {
                 "slabel": [
                     {
-                        "name" : "slabel",
+                        "name": "slabel",
                         "threshold": 0.9,
                         "path": "scl#s7.png"
                     }
@@ -332,13 +286,13 @@
             },
             "subchapters": [
                 {
-                    "name" : "e2",
+                    "name": "e2",
                     "boss_direct": 5,
                     "fight": 100,
                     "templates": {
                         "elabel": [
                             {
-                                "name" : "elabel",
+                                "name": "elabel",
                                 "threshold": 0.9,
                                 "path": "scl#s7e2.png"
                             }
@@ -350,7 +304,6 @@
                         "ei#t2.png",
                         "ei#t1.png",
                         "ei#bonus.png",
-                        
                         "ei#boss.png",
                         "ei#mask3.png",
                         "ei#mask2.png",
@@ -416,6 +369,21 @@
             "threshold": 0.9,
             "name": "blockout",
             "path": "b#blockout.png"
+        },
+        {
+            "threshold": 0.8,
+            "name": "flat1",
+            "path": "b#flat1.png"
+        },
+        {
+            "threshold": 0.8,
+            "name": "flat2",
+            "path": "b#flat2.png"
+        },
+        {
+            "threshold": 0.9,
+            "name": "switchfleet",
+            "path": "b#switchfleet.png"
         }
     ]
 }

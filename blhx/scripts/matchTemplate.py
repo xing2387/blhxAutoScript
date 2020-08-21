@@ -158,9 +158,10 @@ if __name__ == "__main__":
 
     # M = cv.getPerspectiveTransform(m1, m2)
     # dst = cv.warpPerspective(img, M, (imgW, imgH), cv.INTER_LINEAR)x-special/nautilus-clipboard
-    # showimg(dst)x-special/nautilus-clipboardx-special/nautilus-clipboard
+    # showimg(dst)x-special/nautilus-clipboardx-special/nautilus-clipboardx-special/nautilus-clipboard
 
-    template = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/enemy_icons/sp2008sp3_3.png")
+
+    template = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/1080p_ch/buttons/flat1.png")
     mask = cv.imread("/home/xing/workspace/myself/blhxAutoScript/blhx/scripts/res/enemy_icons/mask2.png")
     result = matchSingleTemplate(img, template, 0.8, None, False)
     # print(result)

@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import json
+import cv2 as cv
 
 '''
 - base_dir:
@@ -14,10 +15,14 @@ import json
         - rect: [x, y, w, h]
 '''
 
+_resRootDir = "./res/"
+resolution = 1080
 
 def getPath(path):
+    global _resRootDir
     prefix, path = path.split("#")
-    return Configure.getBaseDir()[prefix] + path
+    path = _resRootDir + Configure.getBaseDir()[prefix] + path
+    return path
 
 
 class Configure():
@@ -29,6 +34,13 @@ class Configure():
     __subchapterLabels = None
     __chapters = None
     __buttons = None
+
+    @classmethod
+    def setResRootDir(cls, dirPath):
+        global _resRootDir
+        if (type(dirPath) is str) and len(dirPath) > 0:
+            print("dirPath[-1] " + dirPath[-1])
+            _resRootDir = dirPath + ("" if dirPath[-1] == "/" else "/")
 
     @classmethod
     def getConf(cls):
@@ -160,7 +172,7 @@ class Scene():
 
 
 class Template():
-    __slots__ = "path", "rect", "name", "threshold"
+    __slots__ = "path", "rect", "name", "threshold", "cvimg"
 
     @classmethod
     def parseFromDict(cls, dataDict):
@@ -173,7 +185,16 @@ class Template():
         self.path = getPath(path)
         self.name = name
         self.threshold = threshold
-
+        self.cvimg = None
+    
+    def getImg(self):
+        if self.cvimg is None:
+            self.cvimg = cv.imread(self.path)
+        if resolution != 1080:
+            h = self.cvimg.shape[0] * resolution / 1080
+            w = self.cvimg.shape[1] * resolution / 1080
+            self.cvimg = cv.resize(self.cvimg, (w,h))
+        return self.cvimg
 
 class Rect():
     __slots__ = "x", "y"
@@ -189,6 +210,7 @@ class Rect():
 if __name__ == "__main__":
     # print(Configure.getScenes())
     # print(Configure.getScenes()[0].templates[0].path)
+    Configure.setResRootDir("../res")
     print(Configure.getEnemyIcons('s3', 'e4'))
     # print(Configure.getChapter('s3').subchapters)
     # print(getScene().name)

@@ -41,6 +41,19 @@ def getScreenshot():
     getpic.downloadScreenshot("/tmp/sdafwer.jpg", device)
     return cv.imread("/tmp/sdafwer.jpg")
 
+def isFleet1(sourceImg = None):
+    if sourceImg is None:
+        sourceImg = getScreenshot()
+    template = Configure.getButton("flat1")
+    hasItem, loc = matchTemplate.hasItem(sourceImg, template.getImg(), template.threshold)
+    return hasItem
+
+def isFleet2(sourceImg = None):
+    if sourceImg is None:
+        sourceImg = getScreenshot()
+    template = Configure.getButton("flat2")
+    hasItem, loc = matchTemplate.hasItem(sourceImg, template.getImg(), template.threshold)
+    return hasItem
 
 def findChapter(subchapterName):
     # goto first chapter by clicking last chapter btn 10 times
@@ -48,8 +61,8 @@ def findChapter(subchapterName):
     sourceImg = getScreenshot()
     chapter = Configure.getChapter(s)
     template = chapter.labels[0]
-    templateImg = cv.imread(template.path)
-    hasChapter, loc = matchTemplate.hasItem(sourceImg, templateImg, template.threshold)
+    # templateImg = cv.imread(template.path)
+    hasChapter, loc = matchTemplate.hasItem(sourceImg, template.getImg(), template.threshold)
     if hasChapter:
         click(loc[0][0], loc[0][1], 20, 20, 50)
         return
@@ -58,18 +71,18 @@ def findChapter(subchapterName):
     count = 12
     btnLeft = Configure.getButton("lastchapter")
     btnright = Configure.getButton("nextchapter")
-    imgLeftBtn = cv.imread(btnLeft.path)
-    imgRightBtn = cv.imread(btnright.path)
+    imgLeftBtn = btnLeft.getImg()
+    imgRightBtn = btnright.getImg()
     hasLeft, locL = matchTemplate.hasItem(sourceImg, imgLeftBtn, btnLeft.threshold)
     hasRight, locR = matchTemplate.hasItem(sourceImg, imgRightBtn, btnright.threshold)
     if hasLeft:
         funClickLeft = fpartial(click, x=locL[0][0], y=locL[0][1] - imgLeftBtn.shape[0], w=50, h=-90, deltaT=50)
     else:
-        funClickLeft = None
+        funClickLeft = fpartial(print, "")
     if hasRight:
         funClickRight = fpartial(click, x=locR[0][0], y=locR[0][1] - imgRightBtn.shape[0], w=50, h=-90, deltaT=50)
     else:
-        funClickRight = None
+        funClickRight = fpartial(print, "")
     print("========================== " + str(hasLeft) +
           " ==== " + str(hasRight) + " ==========")
     if not hasLeft:
@@ -81,13 +94,11 @@ def findChapter(subchapterName):
     while (count > 0):
         clickLeft = (10 * random.random()) > 1
         if clickLeft:
-            if funClickLeft:
-                funClickLeft()
-                count -= 1
+            funClickLeft()
+            count -= 1
         else:
-            if funClickRight:
-                funClickRight()
-                count += 1
+            funClickRight()
+            count += 1
         time.sleep(2)
     extraRight = round(3 * random.random())
     count = page + extraRight
@@ -124,7 +135,7 @@ def precombat(locations, sourceImg, subchapterName):
     s, e = splitSubchapterName(subchapterName)
     try:
         template = Configure.getSubchapter(s, e).labels[0]
-        templateImg = cv.imread(template.path)
+        templateImg = template.getImg()
         attempt = 0
         attemptTimes = 2
         for x in range(attemptTimes):
@@ -204,20 +215,30 @@ def isSelfMoved(lastLoc, selfLoc=None):
     else:
         return None
 
-def clickBotton(name):
+def clickBotton(name, sourceImg = None):
+    if sourceImg is None:
+        sourceImg = getScreenshot()
     btn = Configure.getButton(name)
-    while True:
-        hasItem, loc = matchTemplate.hasItem(sourceImg, cv.imread(btn.path), btn.threshold)
-        if hasItem:
-            click(x=loc[0][0], y=loc[0][1], w=50, h=50, deltaT=50)
-            time.sleep(3)
-        else:
-            break
+    hasItem, loc = matchTemplate.hasItem(sourceImg, btn.getImg(), btn.threshold)
+    if hasItem:
+        click(x=loc[0][0], y=loc[0][1], w=50, h=50, deltaT=50)
+        time.sleep(3)
     
+def switchFleet(sourceImg = None):
+    global fleet
+    if sourceImg is None:
+        sourceImg = getScreenshot()
+    if ((fleet == 1) and isFleet1(sourceImg)) or ((fleet == 2) and isFleet2(sourceImg)):
+        return False
+    else:
+        clickBotton("switchfleet", sourceImg)
+        return True
 
 minDistance = 500
 def subchapter(locations, sourceImg, subchapterName):
     global limitMove
+    if switchFleet(sourceImg):
+        sourceImg = getScreenshot()
     s, e = splitSubchapterName(subchapterName)
     subchapter = Configure.getSubchapter(s, e)
     count = subchapter.fight
@@ -508,11 +529,14 @@ def battle(subchapterName, preferSenceIndex=0):
 device = None
 limitMove = False
 lastScene = None
+fleet = 1
 def main(argv):
     global device
     global limitMove
-    opts, args = getopt.getopt(argv, "c:d:l:", ["chapter=", "device=", "limie="])
+    global fleet
+    opts, args = getopt.getopt(argv, "c:d:l:p:f:", ["chapter=", "device=", "limie=", "profile=", "fleet="])
     subchapterName = None
+    Configure.setResRootDir("./res/1080p_ch")
     for opt, arg in opts:
         if opt in ("-c", "--chapter"):
             subchapterName = arg
@@ -522,6 +546,12 @@ def main(argv):
         elif opt in ("-l", "--limit"):
             limitMove = (arg == "True")
             print("device "+str(device))
+        elif opt in ("-p", "--profile"):
+            print("profile "+str(arg))
+            Configure.setResRootDir(arg)
+        elif opt in ("-f", "--fleet"):
+            print("fleet "+str(arg))
+            fleet = int(arg)
     # print(isSubchapterScene())
     getpic.screenshotStart(device)
     battle(subchapterName)

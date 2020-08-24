@@ -181,14 +181,34 @@ def shortEnemyPositionList(points, shortOrder):
 
 def findEnemies(sourceImg, enemyIconsImg, enemyIconsMask, threshold=0.8):
     # print(sourceImg.shape)
-    rect = Rect(0, 0, sourceImg.shape[1], sourceImg.shape[0])
-    locs = matchTemplate.matchMutiTemplateInRect(sourceImg, enemyIconsImg, threshold, rect, masks=enemyIconsMask)
+    global fieldRect
+    locs = matchTemplate.matchMutiTemplateInRect(sourceImg, enemyIconsImg, threshold, fieldRect, masks=enemyIconsMask)
     shortEnemyPositionList(locs, 1)
     return locs
 
 
 def clickToFight(pt):
-    click(pt[0]+40, pt[1]+60, 90, 60, 80)
+    global fieldRect
+    global screenSize
+    x = (pt[0] + 40) + 90 * random.random()
+    y = (pt[1] + 60) + 60 * random.random()
+    centerX = screenSize - 50 + (100 * random.random())
+    centerY = screenSize - 50 + (100 * random.random())
+    if x < fieldRect.x or x > (fieldRect.x + fieldRect.width):
+        dist = 90 + 30 * random.random()
+        if x > fieldRect.x:
+            dist = -dist
+        inputhelper.drag(centerX, centerY, centerX + dist, centerY + (20 * random.random()))
+        return False
+    if y < fieldRect.y or y > (fieldRect.y + fieldRect.height):
+        dist = 90 + 30 * random.random()
+        if y > fieldRect.y:
+            dist = -dist
+        inputhelper.drag(centerX, centerY, centerX + (20 * random.random()), centerY + dist)
+        return False
+    inputhelper.click(x, y, round(80*random.random()))
+    return True
+
 
 def isSubchapterScene(sourceImg=None):
     if sourceImg is None:
@@ -284,7 +304,9 @@ def subchapter(locations, sourceImg, subchapterName):
             else:
                 lastLoc = lastLoc[0]
         while True:
-            clickToFight(enemyLoc)
+            if not clickToFight(enemyLoc):
+                time.sleep(2)
+                break
             time.sleep(1)
             sourceImg = getScreenshot()
             bb = Configure.getButton("blockout")
@@ -530,6 +552,9 @@ device = None
 limitMove = False
 lastScene = None
 fleet = 1
+fieldRect = Rect(180, 100, 1570, 850)
+screenSize = 1080
+
 def main(argv):
     global device
     global limitMove

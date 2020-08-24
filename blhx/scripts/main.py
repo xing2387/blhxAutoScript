@@ -385,7 +385,7 @@ def formation(locations, sourceImg, subchapterName):
 
 def victory(locations, sourceImg, subchapterName):
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
-    time.sleep(2)
+    time.sleep(5)
     return 'subchapter'
 
 
@@ -411,6 +411,8 @@ def getship(locations, sourceImg, subchapterName):
 
 
 def battleend(locations, sourceImg, subchapterName):
+    click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
+    time.sleep(1)
     click(locations[0][0][0], locations[0][0][1], 100, 50, 70)
     time.sleep(2)
     return 'getitem'

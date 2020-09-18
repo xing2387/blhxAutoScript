@@ -187,11 +187,11 @@ def findEnemies(sourceImg, enemyIconsImg, enemyIconsMask, threshold=0.8):
     return locs
 
 
-def clickToFight(pt):
+def clickToFight2(pt, offset, size):
     global fieldRect
     global screenSize
-    x = (pt[0] + 40) + 90 * random.random()
-    y = (pt[1] + 60) + 60 * random.random()
+    x = (pt[0] + offset[0]) + size[0] * random.random()
+    y = (pt[1] + offset[1]) + size[1] * random.random()
     centerX = screenSize - 50 + (100 * random.random())
     centerY = screenSize - 50 + (100 * random.random())
     if x < fieldRect.x or x > (fieldRect.x + fieldRect.width):
@@ -209,6 +209,9 @@ def clickToFight(pt):
     inputhelper.click(x, y, round(80*random.random()))
     return True
 
+
+def clickToFight(pt):
+    return clickToFight2(pt, (40, 60), (90, 60))
 
 def isSubchapterScene(sourceImg=None):
     if sourceImg is None:
@@ -254,7 +257,7 @@ def switchFleet(sourceImg = None):
         clickBotton("switchfleet", sourceImg)
         return True
 
-minDistance = 500
+minDistance = 200
 def subchapter(locations, sourceImg, subchapterName):
     global limitMove
     if switchFleet(sourceImg):
@@ -264,13 +267,21 @@ def subchapter(locations, sourceImg, subchapterName):
     count = subchapter.fight
     enemyIconsImg = []
     enemyIconsMask = []
+
+    bossIconImg = []
+    bossIconMask = []
+
     iconCount = len(subchapter.enemyIcons)
-    for enemyIcon in subchapter.enemyIcons[1:int(iconCount/2)]:
-        enemyIconsImg.append(cv.imread(enemyIcon))
-    for enemyIcon in subchapter.enemyIcons[int(iconCount/2)+1:]:
-        enemyIconsMask.append(cv.imread(enemyIcon))
-    bossIconImg = cv.imread(subchapter.enemyIcons[0])
-    bossIconMask = cv.imread(subchapter.enemyIcons[int(iconCount/2)])
+    for enemyIcon in subchapter.enemyIcons[0:int(iconCount/2)]:
+        if "boss" in enemyIcon:
+            bossIconImg.append(cv.imread(enemyIcon))
+        else:
+            enemyIconsImg.append(cv.imread(enemyIcon))
+    for enemyIcon in subchapter.enemyIcons[int(iconCount/2):]:
+        if "boss" in enemyIcon:
+            bossIconMask.append(cv.imread(enemyIcon))
+        else:
+            enemyIconsMask.append(cv.imread(enemyIcon))
     enemyLoc = None
     limitCount = 3
     while count > 0:
@@ -286,10 +297,22 @@ def subchapter(locations, sourceImg, subchapterName):
                 time.sleep(10)
                 return 'battleend'
         locs = []
+
+        offset = (40, 60)
+        size = (90, 60)
         if (not limitMove) or (enemyLoc is None):
-            locs = findEnemies(sourceImg, [bossIconImg], [bossIconMask], 0.7)
-            if len(locs) <= 0:
-                locs = findEnemies(sourceImg, enemyIconsImg, enemyIconsMask)
+            iconIndex = 0
+            while len(locs) <= 0 and iconIndex < len(bossIconImg):
+                locs = findEnemies(sourceImg, [bossIconImg[iconIndex]], [bossIconMask[iconIndex]])
+                offset = (0, 0)
+                size = (bossIconImg[iconIndex].shape[1]-10, bossIconImg[iconIndex].shape[0]-10)
+                iconIndex += 1
+            iconIndex = 0
+            while len(locs) <= 0 and iconIndex < len(enemyIconsImg):
+                locs = findEnemies(sourceImg, [enemyIconsImg[iconIndex]], [enemyIconsMask[iconIndex]])
+                iconIndex += 1
+                offset = (40, 60)
+                size = (90, 60)
             if len(locs) <= 0:
                 inputhelper.dragRandom(3)
                 continue
@@ -304,11 +327,15 @@ def subchapter(locations, sourceImg, subchapterName):
             else:
                 lastLoc = lastLoc[0]
         while True:
-            if not clickToFight(enemyLoc):
+            if not clickToFight2(enemyLoc, offset, size):
                 time.sleep(2)
                 break
             time.sleep(1)
             sourceImg = getScreenshot()
+            bb = Configure.getButton("outrange")
+            hasItem, aa = matchTemplate.hasItem(sourceImg, cv.imread(bb.path), bb.threshold)
+            if hasItem:
+                break
             bb = Configure.getButton("blockout")
             hasItem, aa = matchTemplate.hasItem(sourceImg, cv.imread(bb.path), bb.threshold)
             if hasItem:
@@ -350,7 +377,7 @@ def subchapter(locations, sourceImg, subchapterName):
             if limitCount == 0 or distH * distH + distV * distV < 100 * 100:
                 # enemyLoc = None
                 # break
-                if len(locs) == 0:
+                if len(locs) == 1:
                     # clickBotton("withdraw")
                     # return None
                     inputhelper.dragRandom()
@@ -361,7 +388,7 @@ def subchapter(locations, sourceImg, subchapterName):
                     enemyLoc = locs[-1]
                     break
             print("limitMove self: " + str(selfLoc) + ", dist "+ str(distH) +", " + str(distV) + ", loc "+ str(enemyLoc))
-            clickToFight([selfLoc[0] - distH , selfLoc[1] - distV])
+            clickToFight2([selfLoc[0] - distH , selfLoc[1] - distV], offset, size)
             lastLoc = selfLoc
             time.sleep(5)
             sourceImg = getScreenshot()

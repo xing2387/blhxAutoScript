@@ -71,7 +71,8 @@ def main():
         return
     if sys.argv[1] == "click":
         click(float(sys.argv[2]), float(sys.argv[3]), 56)
-
+    elif sys.argv[1] == "drag":
+        drag(float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]))
 
 
 if __name__ == '__main__':

@@ -176,6 +176,16 @@
                     "path": "st#precombat.png"
                 }
             ]
+        },
+        {
+            "name": "precombat",
+            "templates": [
+                {
+                    "threshold": 0.9,
+                    "name": "archor",
+                    "path": "st#precombat2.png"
+                }
+            ]
         }
     ],
     "precombat": {},
@@ -220,15 +230,15 @@
                     },
                     "enemy_icons": [
                         "ei#boss.png",
+                        "ei#bonus.png",
                         "ei#t3.png",
                         "ei#t2.png",
                         "ei#t1.png",
-                        "ei#bonus.png",
                         "ei#boss.png",
+                        "ei#bonus.png",
                         "ei#mask3.png",
                         "ei#mask2.png",
-                        "ei#mask1.png",
-                        "ei#bonus.png"
+                        "ei#mask1.png"
                     ]
                 }
             ]
@@ -300,15 +310,56 @@
                     },
                     "enemy_icons": [
                         "ei#boss.png",
+                        "ei#bonus.png",
                         "ei#t3.png",
                         "ei#t2.png",
                         "ei#t1.png",
-                        "ei#bonus.png",
                         "ei#boss.png",
+                        "ei#bonus.png",
                         "ei#mask3.png",
                         "ei#mask2.png",
-                        "ei#mask1.png",
-                        "ei#bonus.png"
+                        "ei#mask1.png"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "sp200917",
+            "pageIndex": -1,
+            "templates": {
+                "slabel": [
+                    {
+                        "name": "slabel",
+                        "threshold": 0.9,
+                        "path": "scl#sp200917.png"
+                    }
+                ]
+            },
+            "subchapters": [
+                {
+                    "name": "ht1",
+                    "boss_direct": 5,
+                    "fight": 100,
+                    "templates": {
+                        "elabel": [
+                            {
+                                "name": "elabel",
+                                "threshold": 0.9,
+                                "path": "scl#sp200917ht1.png"
+                            }
+                        ]
+                    },
+                    "enemy_icons": [
+                        "ei#sp200917boss_m.png",
+                        "ei#sp200917boss_s.png",
+                        "ei#t3b.png",
+                        "ei#t2b.png",
+                        "ei#t1.png",
+                        "ei#sp200917boss_m.png",
+                        "ei#sp200917boss_s.png",
+                        "ei#t3b.png",
+                        "ei#t2b.png",
+                        "ei#mask1.png"
                     ]
                 }
             ]
@@ -384,6 +435,11 @@
             "threshold": 0.9,
             "name": "switchfleet",
             "path": "b#switchfleet.png"
+        },
+        {
+            "threshold": 0.8,
+            "name": "outrange",
+            "path": "b#outrange.png"
         }
     ]
 }

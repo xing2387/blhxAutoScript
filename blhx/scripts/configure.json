@@ -337,29 +337,36 @@
             },
             "subchapters": [
                 {
-                    "name": "ht1",
+                    "name": "ht3",
                     "boss_direct": 5,
                     "fight": 100,
                     "templates": {
                         "elabel": [
                             {
                                 "name": "elabel",
-                                "threshold": 0.9,
-                                "path": "scl#sp200917ht1.png"
+                                "threshold": 0.95,
+                                "path": "scl#sp200917ht3.png"
                             }
                         ]
                     },
                     "enemy_icons": [
                         "ei#sp200917boss_m.png",
                         "ei#sp200917boss_s.png",
-                        "ei#t3b.png",
-                        "ei#t2b.png",
-                        "ei#t1.png",
+                        "ei#t3b1.png",
+                        "ei#t3b2.png",
+                        "ei#t2b1.png",
+                        "ei#t2b2.png",
+                        "ei#t1b1.png",
+                        "ei#t1b2.png",
+
                         "ei#sp200917boss_m.png",
                         "ei#sp200917boss_s.png",
-                        "ei#t3b.png",
-                        "ei#t2b.png",
-                        "ei#mask1.png"
+                        "ei#t3b1.png",
+                        "ei#t3b2.png",
+                        "ei#t2b1.png",
+                        "ei#t2b2.png",
+                        "ei#t1b1.png",
+                        "ei#t1b2.png"
                     ]
                 }
             ]

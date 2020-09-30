@@ -179,7 +179,7 @@ def shortEnemyPositionList(points, shortOrder):
     pass
 
 
-def findEnemies(sourceImg, enemyIconsImg, enemyIconsMask, threshold=0.8):
+def findEnemies(sourceImg, enemyIconsImg, enemyIconsMask, threshold=0.9):
     # print(sourceImg.shape)
     global fieldRect
     locs = matchTemplate.matchMutiTemplateInRect(sourceImg, enemyIconsImg, threshold, fieldRect, masks=enemyIconsMask)
@@ -308,11 +308,15 @@ def subchapter(locations, sourceImg, subchapterName):
                 size = (bossIconImg[iconIndex].shape[1]-10, bossIconImg[iconIndex].shape[0]-10)
                 iconIndex += 1
             iconIndex = 0
-            while len(locs) <= 0 and iconIndex < len(enemyIconsImg):
-                locs = findEnemies(sourceImg, [enemyIconsImg[iconIndex]], [enemyIconsMask[iconIndex]])
-                iconIndex += 1
+            if len(locs) <= 0:
+                locs = findEnemies(sourceImg, enemyIconsImg, enemyIconsMask)
                 offset = (40, 60)
                 size = (90, 60)
+            # while len(locs) <= 0 and iconIndex < len(enemyIconsImg):
+            #     locs = findEnemies(sourceImg, [enemyIconsImg[iconIndex]], [enemyIconsMask[iconIndex]])
+            #     iconIndex += 1
+            #     offset = (40, 60)
+            #     size = (90, 60)
             if len(locs) <= 0:
                 inputhelper.dragRandom(3)
                 continue

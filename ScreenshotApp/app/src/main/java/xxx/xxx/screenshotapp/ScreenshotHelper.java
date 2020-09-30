@@ -96,7 +96,7 @@ public class ScreenshotHelper extends BaseHelper {
         int width = (int) (mScreenSize.x * mScale);
         int height = (int) (mScreenSize.y * mScale);
         Bitmap b = null;
-        if (Build.VERSION.SDK_INT <= 28) {
+        if (Build.VERSION.SDK_INT < 28) {
             b = (Bitmap) Class.forName(surfaceClassName).getDeclaredMethod("screenshot",
                     Integer.TYPE, Integer.TYPE).invoke(null, width, height);
         } else {

@@ -585,7 +585,7 @@ device = None
 limitMove = False
 lastScene = None
 fleet = 1
-fieldRect = Rect(180, 100, 1570, 850)
+fieldRect = Rect(180, 100, 1810, 830)
 screenSize = 1080
 
 def main(argv):

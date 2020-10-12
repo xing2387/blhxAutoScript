@@ -178,7 +178,7 @@
             ]
         },
         {
-            "name": "precombat",
+            "name": "precombat2",
             "templates": [
                 {
                     "threshold": 0.9,

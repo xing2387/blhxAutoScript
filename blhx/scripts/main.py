@@ -532,6 +532,7 @@ actionFunctions = {
     'home':         home,
     #选章节
     'precombat':    precombat,
+    'precombat2':    precombat,
     #选完章节后的立即前往，和舰队选择
     'gofight':      gofight,
     #遭遇伏击
